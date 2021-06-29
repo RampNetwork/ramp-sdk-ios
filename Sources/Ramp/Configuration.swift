@@ -15,7 +15,6 @@ public struct Configuration {
     public var url: String? = nil
     public var webhookStatusUrl: String? = nil
     public var finalUrl: String? = nil
-    private let variant: String = "sdk-mobile"
     public var containerNode: String? = nil
     public var hostApiKey: String? = nil
     public var deepLinkScheme: String? = nil // undocumented
@@ -43,10 +42,9 @@ public struct Configuration {
 
 extension Configuration {
     public enum Error: Swift.Error { case invalidUrl, invalidParameters }
-    private static let defaultUrl: String = "https://buy.ramp.network"
     
     func buildUrl() throws -> URL {
-        let url = url ?? Configuration.defaultUrl
+        let url = url ?? Constants.defaultUrl
         guard var urlComponents = URLComponents(string: url) else { throw Error.invalidUrl }
         
         urlComponents.appendQueryItem(name: "swapAsset", value: swapAsset)
@@ -61,7 +59,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
         urlComponents.appendQueryItem(name: "webhookStatusUrl", value: webhookStatusUrl)
         urlComponents.appendQueryItem(name: "finalUrl", value: finalUrl)
-        urlComponents.appendQueryItem(name: "variant", value: variant)
+        urlComponents.appendQueryItem(name: "variant", value: Constants.sdkVariant)
         urlComponents.appendQueryItem(name: "containerNode", value: containerNode)
         urlComponents.appendQueryItem(name: "hostApiKey", value: hostApiKey)
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)

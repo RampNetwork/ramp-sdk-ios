@@ -3,8 +3,6 @@ import WebKit
 import Passbase
 
 public final class RampViewController: UIViewController {
-    private let scriptMessageHandlerName: String = "RampInstantMobile"
-    private let defaultPassbaseApiKey: String = "9275d00a4d7fced8b6898b5ea59409e02183a3422c7ed095ec9e81e8898480ce"
     private let url: URL
     
     private var rampColor: UIColor { UIColor(red: 19/255.0, green: 159/255.0, blue: 106/255.0, alpha: 1) }
@@ -81,11 +79,11 @@ public final class RampViewController: UIViewController {
     private func subscribeMessageHandler() {
         let handler = ScriptMessageHandler()
         handler.delegate = self
-        contentController.add(handler, name: scriptMessageHandlerName)
+        contentController.add(handler, name: Constants.scriptMessageHandlerName)
     }
     
     private func unsubscribeMessageHandler() {
-        contentController.removeScriptMessageHandler(forName: scriptMessageHandlerName)
+        contentController.removeScriptMessageHandler(forName: Constants.scriptMessageHandlerName)
     }
     
     private func sendOutgoingEvent(_ event: OutgoingEvent) {
@@ -126,7 +124,7 @@ public final class RampViewController: UIViewController {
     private var verificationId: Int?
     
     private func startPassbaseFlow(_ payload: KycInitPayload) {
-        let apiKey = payload.apiKey ?? defaultPassbaseApiKey
+        let apiKey = payload.apiKey ?? Constants.defaultPassbaseApiKey
         verificationId = payload.verificationId
         
         PassbaseSDK.initialize(publishableApiKey: apiKey)
