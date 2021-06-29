@@ -4,8 +4,6 @@ import Passbase
 
 public final class RampViewController: UIViewController {
     private let url: URL
-    
-    private var rampColor: UIColor { UIColor(red: 19/255.0, green: 159/255.0, blue: 106/255.0, alpha: 1) }
 
     private weak var webView: WKWebView!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
@@ -70,7 +68,7 @@ public final class RampViewController: UIViewController {
         let noTitle = "No, continue"
         
         let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.view.tintColor = rampColor
+        alert.view.tintColor = Constants.rampColor
         let yesAction = UIAlertAction(title: yesTitle, style: .destructive) { [unowned self]  _ in
             self.closeRamp()
         }
