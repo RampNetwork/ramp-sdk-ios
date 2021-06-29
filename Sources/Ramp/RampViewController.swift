@@ -38,12 +38,29 @@ public final class RampViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
+        setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
     
     deinit {
         unsubscribeMessageHandler()
+    }
+    
+    private func setupSwipeBackGesture() {
+        let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleSwipeBackGesture))
+        gesture.edges = .left
+        webView.addGestureRecognizer(gesture)
+    }
+    
+    @objc private func handleSwipeBackGesture(_ sender: UIScreenEdgePanGestureRecognizer) {
+        let view = sender.view!
+        let deltaX = sender.translation(in: view).x
+        guard sender.state == .ended else { return }
+        let fraction = abs(deltaX / view.bounds.width)
+        if fraction >= 0.35 {
+            // TODO: back navigation code here
+        }
     }
     
     private func showCloseAlert() {
