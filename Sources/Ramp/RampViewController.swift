@@ -109,7 +109,6 @@ public final class RampViewController: UIViewController {
         case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.rampPurchase)
         case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
-        default: break
         }
     }
     
