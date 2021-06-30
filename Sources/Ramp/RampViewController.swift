@@ -251,11 +251,6 @@ extension RampViewController: ScriptMessageDelegate {
 
 /// Documentation: https://docs.passbase.com/ios#4-handling-verifications
 extension RampViewController: PassbaseDelegate {
-    private enum PassbaseError: String {
-        case cancelledByUser = "CANCELLED_BY_USER"
-        case biometricAuthenticationFailed = "BIOMETRIC_AUTHENTICATION_FAILED"
-    }
-
     public func onStart() {
         handlePassbaseStarted()
     }
