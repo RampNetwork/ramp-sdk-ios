@@ -45,6 +45,8 @@ public final class RampViewController: UIViewController {
         unsubscribeMessageHandler()
     }
     
+    // MARK: Actions
+    
     private func setupSwipeBackGesture() {
         let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleSwipeBackGesture))
         gesture.edges = .left
@@ -56,9 +58,7 @@ public final class RampViewController: UIViewController {
         let deltaX = sender.translation(in: view).x
         guard sender.state == .ended else { return }
         let fraction = abs(deltaX / view.bounds.width)
-        if fraction >= 0.35 {
-            sendOutgoingEvent(.navigationBack)
-        }
+        if fraction >= 0.35 { sendOutgoingEvent(.navigationBack) }
     }
     
     private func showCloseAlert() {
@@ -124,12 +124,8 @@ public final class RampViewController: UIViewController {
     }
     
     private func handleCloseRampEvent(_ payload: WidgetClosePayload) {
-        if payload.showAlert {
-            showCloseAlert()
-        }
-        else {
-            closeRamp()
-        }
+        if payload.showAlert { showCloseAlert() }
+        else { closeRamp() }
     }
     
     // MARK: Passbase actions
@@ -213,12 +209,8 @@ public final class RampViewController: UIViewController {
 extension RampViewController: WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         let app = UIApplication.shared
-        if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) {
-            app.open(navigationUrl)
-        }
-        else {
-            delegate?.ramp(self, didRaiseError: Error.unableToOpenUrl)
-        }
+        if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) { app.open(navigationUrl) }
+        else { delegate?.ramp(self, didRaiseError: Error.unableToOpenUrl) }
         return nil
     }
 }
