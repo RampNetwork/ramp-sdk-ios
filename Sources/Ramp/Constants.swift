@@ -12,4 +12,6 @@ struct Constants {
     static let closeAlertMessage = "You will loose all progress and will have to start over"
     static let closeAlertYesAction = "Yes, close"
     static let closeAlertNoAction = "No, continue"
+    
+    static func postMessageScript(_ message: String) -> String { "window.postMessage(\(message));" }
 }

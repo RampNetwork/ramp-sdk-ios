@@ -104,7 +104,7 @@ public final class RampViewController: UIViewController {
             delegate?.ramp(self, didRaiseError: Error.serializeOutgoingEventFailed)
             return
         }
-        let script = "window.postMessage(\(message));"
+        let script = Constants.postMessageScript(message)
         webView.evaluateJavaScript(script) { [weak self] response, error in
             if let error = error, let self = self {
                 self.delegate?.ramp(self, didRaiseError: error)
