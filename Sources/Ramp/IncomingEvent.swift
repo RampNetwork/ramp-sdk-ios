@@ -27,7 +27,7 @@ extension IncomingEvent: DictionaryDecodable {
             guard let payload = payload else { throw Error.missingPayload }
             let kycInitPayload = try decoder.decode(payload, to: KycInitPayload.self)
             self = .kycInit(kycInitPayload)
-        default: throw Error.missingType
+        default: throw Error.unknownType
         }
     }
 }
