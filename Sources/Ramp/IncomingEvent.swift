@@ -14,19 +14,19 @@ extension IncomingEvent: DictionaryDecodable {
         guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
         let payload = dictionary["payload"]
         switch eventType {
-        case "PURCHASE_CREATED":
-            guard let payload = payload else { throw Error.missingPayload }
-            let purchaseCreatedPayload = try decoder.decode(payload, to: PurchaseCreatedPayload.self)
-            self = .purchaseCreated(purchaseCreatedPayload)
-        case "WIDGET_CLOSE":
-            guard let payload = payload else { throw Error.missingPayload }
-            let widgetClosePayload = try decoder.decode(payload, to: WidgetClosePayload.self)
-            self = .widgetClose(widgetClosePayload)
-        case "PURCHASE_FAILED": self = .purchaseFailed
         case "KYC_INIT":
             guard let payload = payload else { throw Error.missingPayload }
             let kycInitPayload = try decoder.decode(payload, to: KycInitPayload.self)
             self = .kycInit(kycInitPayload)
+        case "PURCHASE_CREATED":
+            guard let payload = payload else { throw Error.missingPayload }
+            let purchaseCreatedPayload = try decoder.decode(payload, to: PurchaseCreatedPayload.self)
+            self = .purchaseCreated(purchaseCreatedPayload)
+        case "PURCHASE_FAILED": self = .purchaseFailed
+        case "WIDGET_CLOSE":
+            guard let payload = payload else { throw Error.missingPayload }
+            let widgetClosePayload = try decoder.decode(payload, to: WidgetClosePayload.self)
+            self = .widgetClose(widgetClosePayload)
         default: throw Error.unknownType
         }
     }
