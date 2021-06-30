@@ -6,6 +6,7 @@ enum OutgoingEvent {
     case kycSuccess(KycSuccessPayload)
     case kycAborted(KycAbortedPayload)
     case kycError(KycErrorPayload)
+    case navigationBack
 }
 
 extension OutgoingEvent: MessageEventEncodable {
@@ -13,7 +14,7 @@ extension OutgoingEvent: MessageEventEncodable {
     
     func messagePayload() throws -> String {
         let type: String
-        let payloadData: Data
+        let payloadData: Data?
         switch self {
         case .kycStarted(let payload):
             type = "KYC_STARTED"
@@ -30,8 +31,17 @@ extension OutgoingEvent: MessageEventEncodable {
         case .kycError(let payload):
             type = "KYC_ERROR"
             payloadData = try encoder.encode(payload)
+        case .navigationBack:
+            type = "NAVIGATION_BACK"
+            payloadData = nil
         }
-        let serializedPayload = try JSONSerialization.jsonObject(with: payloadData)
+        
+        let serializedPayload: Any?
+        if let payloadData = payloadData {
+            serializedPayload = try JSONSerialization.jsonObject(with: payloadData)
+        } else {
+            serializedPayload = nil
+        }
         let dictionary = ["type": type,
                           "payload": serializedPayload]
         let jsonData = try JSONSerialization.data(withJSONObject: dictionary)

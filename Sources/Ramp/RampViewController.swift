@@ -57,7 +57,7 @@ public final class RampViewController: UIViewController {
         guard sender.state == .ended else { return }
         let fraction = abs(deltaX / view.bounds.width)
         if fraction >= 0.35 {
-            // TODO: back navigation code here
+            sendOutgoingEvent(.navigationBack)
         }
     }
     
