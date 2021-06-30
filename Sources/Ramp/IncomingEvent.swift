@@ -39,7 +39,7 @@ struct KycInitPayload: Decodable {
     let countryCode: String
     let verificationId: Int
     let provider: String
-    let apiKey: String?
+    let apiKey: String
     let metaData: String?
 }
 

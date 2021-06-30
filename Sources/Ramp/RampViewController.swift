@@ -139,10 +139,9 @@ public final class RampViewController: UIViewController {
     private var verificationId: Int?
     
     private func startPassbaseFlow(_ payload: KycInitPayload) {
-        let apiKey = payload.apiKey ?? Constants.defaultPassbaseApiKey
         verificationId = payload.verificationId
         
-        PassbaseSDK.initialize(publishableApiKey: apiKey)
+        PassbaseSDK.initialize(publishableApiKey: payload.apiKey)
         PassbaseSDK.prefillUserEmail = payload.email
         PassbaseSDK.prefillCountry = payload.countryCode
         PassbaseSDK.metaData = payload.metaData
