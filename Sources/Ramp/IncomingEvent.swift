@@ -61,10 +61,7 @@ struct WidgetClosePayload: Decodable {
 }
 
 struct PurchaseCreatedPayload: Decodable {
-    let test: String
-    let rampPurchase: RampPurchase
-}
-
-public struct RampPurchase: Decodable {
-    let test: String
+    let apiUrl: URL
+    let purchaseViewToken: String
+    let purchase: RampPurchase
 }
