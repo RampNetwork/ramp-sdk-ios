@@ -1,10 +1,12 @@
 import Foundation
 
 enum IncomingEvent {
-    case purchaseCreated(PurchaseCreatedPayload)
-    case widgetClose(WidgetClosePayload)
-    case purchaseFailed
+    case close
     case kycInit(KycInitPayload)
+    case purchaseCreated(PurchaseCreatedPayload)
+    case purchaseFailed
+    case widgetClose(WidgetClosePayload)
+    case widgetConfigDone
 }
 
 extension IncomingEvent: DictionaryDecodable {
@@ -14,19 +16,30 @@ extension IncomingEvent: DictionaryDecodable {
         guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
         let payload = dictionary["payload"]
         switch eventType {
+        
+        case "CLOSE":
+            self = .close
+        
         case "KYC_INIT":
             guard let payload = payload else { throw Error.missingPayload }
             let kycInitPayload = try decoder.decode(payload, to: KycInitPayload.self)
             self = .kycInit(kycInitPayload)
+            
         case "PURCHASE_CREATED":
             guard let payload = payload else { throw Error.missingPayload }
             let purchaseCreatedPayload = try decoder.decode(payload, to: PurchaseCreatedPayload.self)
             self = .purchaseCreated(purchaseCreatedPayload)
+            
         case "PURCHASE_FAILED": self = .purchaseFailed
+            
         case "WIDGET_CLOSE":
             guard let payload = payload else { throw Error.missingPayload }
             let widgetClosePayload = try decoder.decode(payload, to: WidgetClosePayload.self)
             self = .widgetClose(widgetClosePayload)
+            
+        case "WIDGET_CONFIG_DONE":
+            self = .widgetConfigDone
+            
         default: throw Error.unknownType
         }
     }
