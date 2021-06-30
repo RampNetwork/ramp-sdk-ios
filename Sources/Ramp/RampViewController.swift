@@ -120,6 +120,7 @@ public final class RampViewController: UIViewController {
         case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
         case .widgetConfigDone: break
+        case .openLink: break
         }
     }
     
