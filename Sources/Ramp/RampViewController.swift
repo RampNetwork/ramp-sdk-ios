@@ -3,11 +3,7 @@ import WebKit
 import Passbase
 
 public final class RampViewController: UIViewController {
-    private let scriptMessageHandlerName: String = "RampInstantMobile"
-    private let defaultPassbaseApiKey: String = "9275d00a4d7fced8b6898b5ea59409e02183a3422c7ed095ec9e81e8898480ce"
     private let url: URL
-    
-    private var rampColor: UIColor { UIColor(red: 19/255.0, green: 159/255.0, blue: 106/255.0, alpha: 1) }
 
     private weak var webView: WKWebView!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
@@ -40,6 +36,7 @@ public final class RampViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
+        setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -48,18 +45,30 @@ public final class RampViewController: UIViewController {
         unsubscribeMessageHandler()
     }
     
+    // MARK: Actions
+    
+    private func setupSwipeBackGesture() {
+        let gesture = UIScreenEdgePanGestureRecognizer(target: self, action: #selector(handleSwipeBackGesture))
+        gesture.edges = .left
+        webView.addGestureRecognizer(gesture)
+    }
+    
+    @objc private func handleSwipeBackGesture(_ sender: UIScreenEdgePanGestureRecognizer) {
+        let view = sender.view!
+        let deltaX = sender.translation(in: view).x
+        guard sender.state == .ended else { return }
+        let fraction = abs(deltaX / view.bounds.width)
+        if fraction >= 0.35 { sendOutgoingEvent(.navigationBack) }
+    }
+    
     private func showCloseAlert() {
-        let title = "Do you really want to close Ramp?"
-        let message = "You will loose all progress and will have to start over"
-        let yesTitle = "Yes, close"
-        let noTitle = "No, continue"
-        
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        alert.view.tintColor = rampColor
-        let yesAction = UIAlertAction(title: yesTitle, style: .destructive) { [unowned self]  _ in
+        let alert = UIAlertController(title: Constants.closeAlertTitle,
+                                      message: Constants.closeAlertMessage, preferredStyle: .alert)
+        alert.view.tintColor = Constants.rampColor
+        let yesAction = UIAlertAction(title: Constants.closeAlertYesAction, style: .destructive) { [unowned self]  _ in
             self.closeRamp()
         }
-        let noAction = UIAlertAction(title: noTitle, style: .cancel)
+        let noAction = UIAlertAction(title: Constants.closeAlertNoAction, style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
         present(alert, animated: true)
@@ -81,11 +90,11 @@ public final class RampViewController: UIViewController {
     private func subscribeMessageHandler() {
         let handler = ScriptMessageHandler()
         handler.delegate = self
-        contentController.add(handler, name: scriptMessageHandlerName)
+        contentController.add(handler, name: Constants.scriptMessageHandlerName)
     }
     
     private func unsubscribeMessageHandler() {
-        contentController.removeScriptMessageHandler(forName: scriptMessageHandlerName)
+        contentController.removeScriptMessageHandler(forName: Constants.scriptMessageHandlerName)
     }
     
     private func sendOutgoingEvent(_ event: OutgoingEvent) {
@@ -95,7 +104,7 @@ public final class RampViewController: UIViewController {
             delegate?.ramp(self, didRaiseError: Error.serializeOutgoingEventFailed)
             return
         }
-        let script = "window.postMessage(\(message));"
+        let script = Constants.postMessageScript(message)
         webView.evaluateJavaScript(script) { [weak self] response, error in
             if let error = error, let self = self {
                 self.delegate?.ramp(self, didRaiseError: error)
@@ -105,21 +114,18 @@ public final class RampViewController: UIViewController {
     
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
+        case .close: closeRamp()
         case .kycInit(let payload): startPassbaseFlow(payload)
-        case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.rampPurchase)
+        case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.purchase)
         case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
-        default: break
+        case .widgetConfigDone: break
         }
     }
     
     private func handleCloseRampEvent(_ payload: WidgetClosePayload) {
-        if payload.showAlert {
-            showCloseAlert()
-        }
-        else {
-            closeRamp()
-        }
+        if payload.showAlert { showCloseAlert() }
+        else { closeRamp() }
     }
     
     // MARK: Passbase actions
@@ -127,10 +133,9 @@ public final class RampViewController: UIViewController {
     private var verificationId: Int?
     
     private func startPassbaseFlow(_ payload: KycInitPayload) {
-        let apiKey = payload.apiKey ?? defaultPassbaseApiKey
         verificationId = payload.verificationId
         
-        PassbaseSDK.initialize(publishableApiKey: apiKey)
+        PassbaseSDK.initialize(publishableApiKey: payload.apiKey)
         PassbaseSDK.prefillUserEmail = payload.email
         PassbaseSDK.prefillCountry = payload.countryCode
         PassbaseSDK.metaData = payload.metaData
@@ -204,12 +209,8 @@ public final class RampViewController: UIViewController {
 extension RampViewController: WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         let app = UIApplication.shared
-        if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) {
-            app.open(navigationUrl)
-        }
-        else {
-            delegate?.ramp(self, didRaiseError: Error.unableToOpenUrl)
-        }
+        if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) { app.open(navigationUrl) }
+        else { delegate?.ramp(self, didRaiseError: Error.unableToOpenUrl) }
         return nil
     }
 }
@@ -244,11 +245,6 @@ extension RampViewController: ScriptMessageDelegate {
 
 /// Documentation: https://docs.passbase.com/ios#4-handling-verifications
 extension RampViewController: PassbaseDelegate {
-    private enum PassbaseError: String {
-        case cancelledByUser = "CANCELLED_BY_USER"
-        case biometricAuthenticationFailed = "BIOMETRIC_AUTHENTICATION_FAILED"
-    }
-
     public func onStart() {
         handlePassbaseStarted()
     }

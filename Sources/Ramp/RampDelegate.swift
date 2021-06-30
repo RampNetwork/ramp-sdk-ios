@@ -1,9 +1,5 @@
 import Foundation
 
-public extension Notification.Name {
-    static let rampCallback = Notification.Name("RampCallbackNotificationName")
-}
-
 public protocol RampDelegate: AnyObject {
     func ramp(_ rampViewController: RampViewController, didCreatePurchase purchase: RampPurchase)
     func rampPurchaseDidFail(_ rampViewController: RampViewController)
