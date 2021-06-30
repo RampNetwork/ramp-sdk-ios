@@ -16,35 +16,37 @@ extension OutgoingEvent: MessageEventEncodable {
         let type: String
         let payloadData: Data?
         switch self {
+        
         case .kycStarted(let payload):
             type = "KYC_STARTED"
             payloadData = try encoder.encode(payload)
         case .kycSubmitted(let payload):
+            
             type = "KYC_SUBMITTED"
             payloadData = try encoder.encode(payload)
+            
         case .kycSuccess(let payload):
             type = "KYC_SUCCESS"
             payloadData = try encoder.encode(payload)
+            
         case .kycAborted(let payload):
             type = "KYC_ABORTED"
             payloadData = try encoder.encode(payload)
+            
         case .kycError(let payload):
             type = "KYC_ERROR"
             payloadData = try encoder.encode(payload)
+            
         case .navigationBack:
             type = "NAVIGATION_BACK"
             payloadData = nil
         }
         
-        let serializedPayload: Any?
-        if let payloadData = payloadData {
-            serializedPayload = try JSONSerialization.jsonObject(with: payloadData)
-        } else {
-            serializedPayload = nil
-        }
-        let dictionary = ["type": type,
-                          "payload": serializedPayload]
-        let jsonData = try JSONSerialization.data(withJSONObject: dictionary)
+        let payload: Any?
+        if let payloadData = payloadData { payload = try JSONSerialization.jsonObject(with: payloadData) }
+        else { payload = nil }
+        let dictionary = ["type": type, "payload": payload]
+        let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: [.sortedKeys])
         if let jsonString = String(data: jsonData, encoding: .utf8) { return jsonString }
         else { throw Error.stringEncodingFailed }
     }
