@@ -18,26 +18,8 @@ public struct Configuration {
     public var containerNode: String? = nil
     public var hostApiKey: String? = nil
     public var deepLinkScheme: String? = nil
-
-    // Generated Memberwise Initializer
-    public init(swapAsset: String? = nil, swapAmount: String? = nil, fiatCurrency: String? = nil, fiatValue: String? = nil, userAddress: String? = nil, hostLogoUrl: String? = nil, hostAppName: String? = nil, userEmailAddress: String? = nil, selectedCountryCode: String? = nil, defaultAsset: String? = nil, url: String? = nil, webhookStatusUrl: String? = nil, finalUrl: String? = nil, containerNode: String? = nil, hostApiKey: String? = nil, deepLinkScheme: String? = nil) {
-        self.swapAsset = swapAsset
-        self.swapAmount = swapAmount
-        self.fiatCurrency = fiatCurrency
-        self.fiatValue = fiatValue
-        self.userAddress = userAddress
-        self.hostLogoUrl = hostLogoUrl
-        self.hostAppName = hostAppName
-        self.userEmailAddress = userEmailAddress
-        self.selectedCountryCode = selectedCountryCode
-        self.defaultAsset = defaultAsset
-        self.url = url
-        self.webhookStatusUrl = webhookStatusUrl
-        self.finalUrl = finalUrl
-        self.containerNode = containerNode
-        self.hostApiKey = hostApiKey
-        self.deepLinkScheme = deepLinkScheme
-    }
+    
+    public init() {}
 }
 
 extension Configuration {
