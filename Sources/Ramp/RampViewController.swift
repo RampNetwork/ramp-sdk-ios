@@ -62,17 +62,13 @@ public final class RampViewController: UIViewController {
     }
     
     private func showCloseAlert() {
-        let title = "Do you really want to close Ramp?"
-        let message = "You will loose all progress and will have to start over"
-        let yesTitle = "Yes, close"
-        let noTitle = "No, continue"
-        
-        let alert = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        let alert = UIAlertController(title: Constants.closeAlertTitle,
+                                      message: Constants.closeAlertMessage, preferredStyle: .alert)
         alert.view.tintColor = Constants.rampColor
-        let yesAction = UIAlertAction(title: yesTitle, style: .destructive) { [unowned self]  _ in
+        let yesAction = UIAlertAction(title: Constants.closeAlertYesAction, style: .destructive) { [unowned self]  _ in
             self.closeRamp()
         }
-        let noAction = UIAlertAction(title: noTitle, style: .cancel)
+        let noAction = UIAlertAction(title: Constants.closeAlertNoAction, style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
         present(alert, animated: true)
