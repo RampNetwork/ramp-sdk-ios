@@ -143,10 +143,12 @@ public final class RampViewController: UIViewController {
         PassbaseSDK.delegate = self
         
         // Hacky way to present Passbase view
-        let passbaseButton = PassbaseButton(frame: .zero)
-        view.addSubview(passbaseButton)
-        passbaseButton.sendActions(for: .touchUpInside)
-        passbaseButton.removeFromSuperview()
+        DispatchQueue.main.async {
+            let passbaseButton = PassbaseButton(frame: .zero)
+            self.view.addSubview(passbaseButton)
+            passbaseButton.sendActions(for: .touchUpInside)
+            passbaseButton.removeFromSuperview()
+        }
     }
     
     // MARK: Passbase outgoing events
