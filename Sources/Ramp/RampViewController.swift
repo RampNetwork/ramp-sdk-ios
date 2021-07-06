@@ -6,6 +6,7 @@ public final class RampViewController: UIViewController {
     private let url: URL
 
     private weak var webView: WKWebView!
+    private weak var stackView: UIStackView!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
     
     public weak var delegate: RampDelegate?
@@ -21,14 +22,15 @@ public final class RampViewController: UIViewController {
     required init?(coder: NSCoder) { nil }
     
     public override func loadView() {
-        let verticalStackView = UIStackView()
-        verticalStackView.axis = .vertical
-        view = verticalStackView
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        view = stackView
+        self.stackView = stackView
         
         let configuration = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: configuration)
         self.webView = webView
-        verticalStackView.addArrangedSubview(webView)
+        stackView.addArrangedSubview(webView)
         webView.scrollView.showsVerticalScrollIndicator = false
         webView.uiDelegate = self
     }
@@ -245,6 +247,8 @@ extension RampViewController: ScriptMessageDelegate {
         delegate?.ramp(self, didRaiseError: Error.messaveEventReceiveFailed)
     }
 }
+
+// MARK: - Passbase delegate
 
 /// Documentation: https://docs.passbase.com/ios#4-handling-verifications
 extension RampViewController: PassbaseDelegate {
