@@ -7,6 +7,7 @@ public final class RampViewController: UIViewController {
 
     private weak var webView: WKWebView!
     private weak var stackView: UIStackView!
+    private weak var passbaseButton: PassbaseButton!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
     
     public weak var delegate: RampDelegate?
@@ -29,10 +30,15 @@ public final class RampViewController: UIViewController {
         
         let configuration = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: configuration)
-        self.webView = webView
-        stackView.addArrangedSubview(webView)
         webView.scrollView.showsVerticalScrollIndicator = false
         webView.uiDelegate = self
+        stackView.addArrangedSubview(webView)
+        self.webView = webView
+        
+        let passbaseButton = PassbaseButton()
+        passbaseButton.isHidden = true
+        stackView.addArrangedSubview(passbaseButton)
+        self.passbaseButton = passbaseButton
     }
     
     public override func viewDidLoad() {
@@ -144,13 +150,7 @@ public final class RampViewController: UIViewController {
         PassbaseSDK.metaData = payload.metaData
         PassbaseSDK.delegate = self
         
-        // Hacky way to present Passbase view
-        DispatchQueue.main.async {
-            let passbaseButton = PassbaseButton(frame: .zero)
-            self.view.addSubview(passbaseButton)
-            passbaseButton.sendActions(for: .touchUpInside)
-            passbaseButton.removeFromSuperview()
-        }
+        passbaseButton.sendActions(for: .touchUpInside)
     }
     
     // MARK: Passbase outgoing events
