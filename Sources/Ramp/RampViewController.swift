@@ -6,6 +6,8 @@ public final class RampViewController: UIViewController {
     private let url: URL
 
     private weak var webView: WKWebView!
+    private weak var stackView: UIStackView!
+    private weak var passbaseButton: PassbaseButton!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
     
     public weak var delegate: RampDelegate?
@@ -21,22 +23,28 @@ public final class RampViewController: UIViewController {
     required init?(coder: NSCoder) { nil }
     
     public override func loadView() {
-        let verticalStackView = UIStackView()
-        verticalStackView.axis = .vertical
-        view = verticalStackView
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        view = stackView
+        self.stackView = stackView
         
         let configuration = WKWebViewConfiguration()
         let webView = WKWebView(frame: .zero, configuration: configuration)
-        self.webView = webView
-        verticalStackView.addArrangedSubview(webView)
         webView.scrollView.showsVerticalScrollIndicator = false
         webView.uiDelegate = self
+        stackView.addArrangedSubview(webView)
+        self.webView = webView
+        
+        let passbaseButton = PassbaseButton()
+        passbaseButton.isHidden = true
+        stackView.addArrangedSubview(passbaseButton)
+        self.passbaseButton = passbaseButton
     }
     
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
-        setupSwipeBackGesture()
+        // setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -120,6 +128,7 @@ public final class RampViewController: UIViewController {
         case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
         case .widgetConfigDone: break
+        case .openLink: break
         }
     }
     
@@ -141,11 +150,9 @@ public final class RampViewController: UIViewController {
         PassbaseSDK.metaData = payload.metaData
         PassbaseSDK.delegate = self
         
-        // Hacky way to present Passbase view
-        let passbaseButton = PassbaseButton(frame: .zero)
-        view.addSubview(passbaseButton)
-        passbaseButton.sendActions(for: .touchUpInside)
-        passbaseButton.removeFromSuperview()
+        DispatchQueue.main.async {
+            self.passbaseButton.sendActions(for: .touchUpInside)
+        }
     }
     
     // MARK: Passbase outgoing events
@@ -242,6 +249,8 @@ extension RampViewController: ScriptMessageDelegate {
         delegate?.ramp(self, didRaiseError: Error.messaveEventReceiveFailed)
     }
 }
+
+// MARK: - Passbase delegate
 
 /// Documentation: https://docs.passbase.com/ios#4-handling-verifications
 extension RampViewController: PassbaseDelegate {

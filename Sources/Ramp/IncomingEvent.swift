@@ -3,6 +3,7 @@ import Foundation
 enum IncomingEvent {
     case close
     case kycInit(KycInitPayload)
+    case openLink(OpenLinkPayload)
     case purchaseCreated(PurchaseCreatedPayload)
     case purchaseFailed
     case widgetClose(WidgetClosePayload)
@@ -24,6 +25,11 @@ extension IncomingEvent: DictionaryDecodable {
             guard let payload = payload else { throw Error.missingPayload }
             let kycInitPayload = try decoder.decode(payload, to: KycInitPayload.self)
             self = .kycInit(kycInitPayload)
+        
+        case "OPEN_LINK":
+            guard let payload = payload else { throw Error.missingPayload }
+            let openLinkPayload = try decoder.decode(payload, to: OpenLinkPayload.self)
+            self = .openLink(openLinkPayload)
             
         case "PURCHASE_CREATED":
             guard let payload = payload else { throw Error.missingPayload }
@@ -56,12 +62,20 @@ struct KycInitPayload: Decodable {
     let metaData: String?
 }
 
-struct WidgetClosePayload: Decodable {
-    let showAlert: Bool
+struct OpenLinkPayload: Decodable {
+    enum LinkType: String, Codable {
+        case paymentInitiation = "PAYMENT_INITIATION"
+    }
+    let linkType: LinkType
+    let url: URL
 }
 
 struct PurchaseCreatedPayload: Decodable {
     let apiUrl: URL
     let purchaseViewToken: String
     let purchase: RampPurchase
+}
+
+struct WidgetClosePayload: Decodable {
+    let showAlert: Bool
 }
