@@ -44,7 +44,7 @@ public final class RampViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
-        setupSwipeBackGesture()
+        // setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -150,7 +150,9 @@ public final class RampViewController: UIViewController {
         PassbaseSDK.metaData = payload.metaData
         PassbaseSDK.delegate = self
         
-        passbaseButton.sendActions(for: .touchUpInside)
+        DispatchQueue.main.async {
+            self.passbaseButton.sendActions(for: .touchUpInside)
+        }
     }
     
     // MARK: Passbase outgoing events

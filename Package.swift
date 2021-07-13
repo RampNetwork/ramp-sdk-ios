@@ -12,7 +12,7 @@ let package = Package(
         .library(name: "Ramp", targets: ["Ramp"])
     ],
     dependencies: [
-        .package(name: "Passbase", url: "https://github.com/passbase/passbase-sp.git", .upToNextMajor(from: "2.7.0")),
+        .package(name: "Passbase", url: "https://github.com/passbase/passbase-sp.git", .exact("2.7.4")),
     ],
     targets: [
         .target(name: "Ramp", dependencies: ["Passbase"])
