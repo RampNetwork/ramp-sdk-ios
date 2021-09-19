@@ -83,12 +83,7 @@ public final class RampViewController: UIViewController {
     }
     
     private func closeRamp() {
-        guard let presentingViewController = presentingViewController
-        else {
-            delegate?.ramp(self, didRaiseError: Error.closeRampFailed)
-            return
-        }
-        presentingViewController.dismiss(animated: true) { [unowned self] in
+        presentingViewController?.dismiss(animated: true) { [unowned self] in
             self.delegate?.rampDidClose(self)
         }
     }
@@ -106,18 +101,9 @@ public final class RampViewController: UIViewController {
     }
     
     private func sendOutgoingEvent(_ event: OutgoingEvent) {
-        let message: String
-        do { message = try event.messagePayload() }
-        catch {
-            delegate?.ramp(self, didRaiseError: Error.serializeOutgoingEventFailed)
-            return
-        }
+        guard let message = try? event.messagePayload() else { return }
         let script = Constants.postMessageScript(message)
-        webView.evaluateJavaScript(script) { [weak self] response, error in
-            if let error = error, let self = self {
-                self.delegate?.ramp(self, didRaiseError: error)
-            }
-        }
+        webView.evaluateJavaScript(script) { _, _ in }
     }
     
     private func handleIncomingEvent(_ event: IncomingEvent) {
@@ -155,55 +141,35 @@ public final class RampViewController: UIViewController {
     // MARK: Passbase outgoing events
     
     private func handlePassbaseStarted() {
-        guard let verificationId = verificationId
-        else {
-            delegate?.ramp(self, didRaiseError: Error.missingKycVerificationId)
-            return
-        }
+        guard let verificationId = verificationId else { return }
         let payload = KycStartedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycStarted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSubmitted(identityAccessKey: String) {
-        guard let verificationId = verificationId
-        else {
-            delegate?.ramp(self, didRaiseError: Error.missingKycVerificationId)
-            return
-        }
+        guard let verificationId = verificationId else { return }
         let payload = KycSubmittedPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSubmitted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSuccess(identityAccessKey: String) {
-        guard let verificationId = verificationId
-        else {
-            delegate?.ramp(self, didRaiseError: Error.missingKycVerificationId)
-            return
-        }
+        guard let verificationId = verificationId else { return }
         let payload = KycSuccessPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSuccess(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseAborted() {
-        guard let verificationId = verificationId
-        else {
-            delegate?.ramp(self, didRaiseError: Error.missingKycVerificationId)
-            return
-        }
+        guard let verificationId = verificationId else { return }
         let payload = KycAbortedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycAborted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseError() {
-        guard let verificationId = verificationId
-        else {
-            delegate?.ramp(self, didRaiseError: Error.missingKycVerificationId)
-            return
-        }
+        guard let verificationId = verificationId else { return }
         let payload = KycErrorPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycError(payload)
         sendOutgoingEvent(event)
@@ -214,7 +180,6 @@ extension RampViewController: WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         let app = UIApplication.shared
         if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) { app.open(navigationUrl) }
-        else { delegate?.ramp(self, didRaiseError: Error.unableToOpenUrl) }
         return nil
     }
 }
@@ -233,17 +198,8 @@ extension RampViewController {
 
 extension RampViewController: ScriptMessageDelegate {
     func handler(_ scriptMessageHandler: ScriptMessageHandler, didReceiveMessage body: [String : Any]) {
-        let event: IncomingEvent
-        do { event = try IncomingEvent(dictionary: body) }
-        catch {
-            delegate?.ramp(self, didRaiseError: Error.deserializeIncomingEventFailed)
-            return
-        }
+        guard let event = try? IncomingEvent(dictionary: body) else { return }
         handleIncomingEvent(event)
-    }
-    
-    func handler(_ scriptMessageHandler: ScriptMessageHandler, didFailToReceiveMessage body: Any) {
-        delegate?.ramp(self, didRaiseError: Error.messaveEventReceiveFailed)
     }
 }
 
@@ -264,11 +220,7 @@ extension RampViewController: PassbaseDelegate {
     }
     
     public func onError(errorCode: String) {
-        guard let error = PassbaseError(rawValue: errorCode)
-        else {
-            delegate?.ramp(self, didRaiseError: Error.unknownPassbaseError)
-            return
-        }
+        guard let error = PassbaseError(rawValue: errorCode) else { return }
         switch error {
         case .cancelledByUser: handlePassbaseAborted()
         case .biometricAuthenticationFailed: handlePassbaseError()
