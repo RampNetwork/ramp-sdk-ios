@@ -2,7 +2,7 @@ import Foundation
 
 public struct RampPurchase: Decodable {
     public let id: String
-    public let endTime: Date
+    public let endTime: String
     public let asset: AssetInfo
     public let receiverAddress: String
     public let cryptoAmount: String
@@ -14,8 +14,8 @@ public struct RampPurchase: Decodable {
     public let appliedFee: Double
     public let paymentMethodType: String
     public let finalTxHash: String?
-    public let createdAt: Date
-    public let updatedAt: Date
+    public let createdAt: String
+    public let updatedAt: String
     public let status: String
     public let escrowAddress: String?
     public let escrowDetailsHash: String?
