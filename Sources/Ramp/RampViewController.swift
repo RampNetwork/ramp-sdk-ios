@@ -122,13 +122,10 @@ public final class RampViewController: UIViewController {
     
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
-        case .close: closeRamp()
         case .kycInit(let payload): startPassbaseFlow(payload)
         case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.purchase)
         case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
-        case .widgetConfigDone: break
-        case .openLink: break
         }
     }
     
