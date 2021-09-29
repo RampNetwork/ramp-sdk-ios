@@ -1,0 +1,16 @@
+{
+  "object": {
+    "pins": [
+      {
+        "package": "Passbase",
+        "repositoryURL": "https://github.com/passbase/passbase-sp.git",
+        "state": {
+          "branch": null,
+          "revision": "930db0c06127a35699b7b78c7a67e1034e65abcc",
+          "version": "2.7.4"
+        }
+      }
+    ]
+  },
+  "version": 1
+}
