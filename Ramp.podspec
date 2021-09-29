@@ -8,5 +8,5 @@ Pod::Spec.new do |spec|
     spec.source = { :git => 'https://github.com/RampNetwork/ramp-sdk-ios', :tag => spec.version }
     spec.ios.deployment_target  = '11.0'
     spec.source_files = 'Sources/Ramp/*.swift'
-    spec.dependency 'Passbase', '~> 2.7.4'
+    spec.dependency 'Passbase', '~> 2.8'
 end
