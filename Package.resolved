@@ -6,8 +6,8 @@
         "repositoryURL": "https://github.com/passbase/passbase-sp.git",
         "state": {
           "branch": null,
-          "revision": "b209a3a305cc9954d4794f2eca0c3368208968c3",
-          "version": "2.8.0"
+          "revision": "3511ad0b9b105d87e4393972fc61396cbbfa596d",
+          "version": "2.8.1"
         }
       }
     ]
