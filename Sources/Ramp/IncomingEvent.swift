@@ -1,13 +1,10 @@
 import Foundation
 
 enum IncomingEvent {
-    case close
     case kycInit(KycInitPayload)
-    case openLink(OpenLinkPayload)
     case purchaseCreated(PurchaseCreatedPayload)
     case purchaseFailed
     case widgetClose(WidgetClosePayload)
-    case widgetConfigDone
 }
 
 extension IncomingEvent: DictionaryDecodable {
@@ -18,18 +15,10 @@ extension IncomingEvent: DictionaryDecodable {
         let payload = dictionary["payload"]
         switch eventType {
         
-        case "CLOSE":
-            self = .close
-        
         case "KYC_INIT":
             guard let payload = payload else { throw Error.missingPayload }
             let kycInitPayload = try decoder.decode(payload, to: KycInitPayload.self)
             self = .kycInit(kycInitPayload)
-        
-        case "OPEN_LINK":
-            guard let payload = payload else { throw Error.missingPayload }
-            let openLinkPayload = try decoder.decode(payload, to: OpenLinkPayload.self)
-            self = .openLink(openLinkPayload)
             
         case "PURCHASE_CREATED":
             guard let payload = payload else { throw Error.missingPayload }
@@ -42,9 +31,6 @@ extension IncomingEvent: DictionaryDecodable {
             guard let payload = payload else { throw Error.missingPayload }
             let widgetClosePayload = try decoder.decode(payload, to: WidgetClosePayload.self)
             self = .widgetClose(widgetClosePayload)
-            
-        case "WIDGET_CONFIG_DONE":
-            self = .widgetConfigDone
             
         default: throw Error.unknownType
         }
@@ -60,14 +46,6 @@ struct KycInitPayload: Decodable {
     let provider: String
     let apiKey: String
     let metaData: String?
-}
-
-struct OpenLinkPayload: Decodable {
-    enum LinkType: String, Codable {
-        case paymentInitiation = "PAYMENT_INITIATION"
-    }
-    let linkType: LinkType
-    let url: URL
 }
 
 struct PurchaseCreatedPayload: Decodable {
