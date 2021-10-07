@@ -48,10 +48,10 @@ struct KycInitPayload: Decodable {
     let metaData: String?
 }
 
-public struct PurchaseCreatedPayload: Decodable {
-    public let apiUrl: URL
-    public let purchaseViewToken: String
-    public let purchase: RampPurchase
+struct PurchaseCreatedPayload: Decodable {
+    let apiUrl: URL
+    let purchaseViewToken: String
+    let purchase: RampPurchase
 }
 
 struct WidgetClosePayload: Decodable {
