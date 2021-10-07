@@ -8,7 +8,7 @@ enum IncomingEvent {
 }
 
 extension IncomingEvent: DictionaryDecodable {
-    enum Error: Swift.Error { case missingType, missingPayload, unknownType }
+    enum Error: Swift.Error { case missingType, missingPayload, unhandledType }
     
     init(dictionary: [String: Any]) throws {
         guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
@@ -32,7 +32,7 @@ extension IncomingEvent: DictionaryDecodable {
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
-        default: throw Error.unknownType
+        default: throw Error.unhandledType
         }
     }
 }
