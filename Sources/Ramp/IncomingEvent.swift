@@ -8,7 +8,7 @@ enum IncomingEvent {
 }
 
 extension IncomingEvent: DictionaryDecodable {
-    enum Error: Swift.Error { case missingType, missingPayload, unknownType }
+    enum Error: Swift.Error { case missingType, missingPayload, unhandledType }
     
     init(dictionary: [String: Any]) throws {
         guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
@@ -17,22 +17,22 @@ extension IncomingEvent: DictionaryDecodable {
         
         case "KYC_INIT":
             guard let payload = payload else { throw Error.missingPayload }
-            let kycInitPayload = try decoder.decode(payload, to: KycInitPayload.self)
-            self = .kycInit(kycInitPayload)
+            let decoded: KycInitPayload = try decoder.decode(payload)
+            self = .kycInit(decoded)
             
         case "PURCHASE_CREATED":
             guard let payload = payload else { throw Error.missingPayload }
-            let purchaseCreatedPayload = try decoder.decode(payload, to: PurchaseCreatedPayload.self)
-            self = .purchaseCreated(purchaseCreatedPayload)
+            let decoded: PurchaseCreatedPayload = try decoder.decode(payload)
+            self = .purchaseCreated(decoded)
             
         case "PURCHASE_FAILED": self = .purchaseFailed
             
         case "WIDGET_CLOSE":
             guard let payload = payload else { throw Error.missingPayload }
-            let widgetClosePayload = try decoder.decode(payload, to: WidgetClosePayload.self)
-            self = .widgetClose(widgetClosePayload)
+            let decoded: WidgetClosePayload = try decoder.decode(payload)
+            self = .widgetClose(decoded)
             
-        default: throw Error.unknownType
+        default: throw Error.unhandledType
         }
     }
 }

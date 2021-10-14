@@ -6,7 +6,7 @@ enum OutgoingEvent {
     case kycSuccess(KycSuccessPayload)
     case kycAborted(KycAbortedPayload)
     case kycError(KycErrorPayload)
-    case navigationBack
+    case backButtonPressed
 }
 
 extension OutgoingEvent: MessageEventEncodable {
@@ -37,8 +37,8 @@ extension OutgoingEvent: MessageEventEncodable {
             type = "KYC_ERROR"
             payloadData = try encoder.encode(payload)
             
-        case .navigationBack:
-            type = "NAVIGATION_BACK"
+        case .backButtonPressed:
+            type = "BACK_BUTTON_PRESSED"
             payloadData = nil
         }
         

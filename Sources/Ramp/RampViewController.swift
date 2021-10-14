@@ -38,7 +38,7 @@ public final class RampViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
-        // setupSwipeBackGesture()
+         setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -60,7 +60,7 @@ public final class RampViewController: UIViewController {
         let deltaX = sender.translation(in: view).x
         guard sender.state == .ended else { return }
         let fraction = abs(deltaX / view.bounds.width)
-        if fraction >= 0.35 { sendOutgoingEvent(.navigationBack) }
+        if fraction >= 0.27 { sendOutgoingEvent(.backButtonPressed) }
     }
     
     private func showCloseAlert() {
@@ -103,7 +103,9 @@ public final class RampViewController: UIViewController {
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
         case .kycInit(let payload): startPassbaseFlow(payload)
-        case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.purchase)
+        case .purchaseCreated(let payload):
+            delegate?.ramp(self, didCreatePurchase: payload.purchase,
+                           purchaseViewToken: payload.purchaseViewToken, apiUrl: payload.apiUrl)
         case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
         }
