@@ -7,6 +7,7 @@ enum OutgoingEvent {
     case kycAborted(KycAbortedPayload)
     case kycError(KycErrorPayload)
     case backButtonPressed
+    case offrampResponded(OfframpResponse)
 }
 
 extension OutgoingEvent: MessageEventEncodable {
@@ -40,6 +41,10 @@ extension OutgoingEvent: MessageEventEncodable {
         case .backButtonPressed:
             type = "BACK_BUTTON_PRESSED"
             payloadData = nil
+            
+        case .offrampResponded(let payload):
+            type = "OFFRAMP_RESPONSE"
+            payloadData = try encoder.encode(payload)
         }
         
         let payload: Any?

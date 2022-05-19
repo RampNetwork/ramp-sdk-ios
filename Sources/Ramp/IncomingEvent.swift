@@ -5,6 +5,7 @@ enum IncomingEvent {
     case purchaseCreated(PurchaseCreatedPayload)
     case purchaseFailed
     case widgetClose(WidgetClosePayload)
+    case offrampRequested(OfframpRequest)
 }
 
 extension IncomingEvent: DictionaryDecodable {
@@ -31,6 +32,11 @@ extension IncomingEvent: DictionaryDecodable {
             guard let payload = payload else { throw Error.missingPayload }
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
+            
+        case "OFFRAMP_REQUESTED":
+            guard let payload = payload else { throw Error.missingPayload }
+            let decoded: OfframpRequest = try decoder.decode(payload)
+            self = .offrampRequested(decoded)
             
         default: throw Error.unhandledType
         }

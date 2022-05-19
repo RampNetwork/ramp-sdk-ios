@@ -109,12 +109,20 @@ public final class RampViewController: UIViewController {
                            purchaseViewToken: payload.purchaseViewToken, apiUrl: payload.apiUrl)
         case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
+        case .offrampRequested(let request): offrampInfoRequested(request)
         }
     }
     
     private func handleCloseRampEvent(_ payload: WidgetClosePayload) {
         if payload.showAlert { showCloseAlert() }
         else { closeRamp() }
+    }
+    
+    private func offrampInfoRequested(_ request: OfframpRequest) {
+        delegate?.ramp(self, didRequestOfframp: request) { response in
+            let event: OutgoingEvent = .offrampResponded(response)
+            self.sendOutgoingEvent(event)
+        }
     }
     
     // MARK: Passbase actions
