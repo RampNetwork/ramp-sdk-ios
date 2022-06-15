@@ -2,7 +2,7 @@ import Foundation
 
 /// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.ramp.network/configuration)
 public struct Configuration {
-    public enum Flow: String { case onramp, offramp }
+    public enum Flow: String, CaseIterable { case onramp, offramp }
     
     /// main URL
     public var url: String = Constants.defaultUrl
