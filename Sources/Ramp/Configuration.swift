@@ -5,7 +5,7 @@ public struct Configuration {
     public enum Flow: String { case onramp, offramp }
     
     /// main URL
-    public var url: String? = nil
+    public var url: String = Constants.defaultUrl
     
     /// query params
     public var containerNode: String? = nil
@@ -36,7 +36,6 @@ extension Configuration {
     public enum Error: Swift.Error { case invalidUrl, invalidParameters }
     
     func buildUrl() throws -> URL {
-        let url = url ?? Constants.defaultUrl
         guard var urlComponents = URLComponents(string: url) else { throw Error.invalidUrl }
         
         urlComponents.appendQueryItem(name: "containerNode", value: containerNode)

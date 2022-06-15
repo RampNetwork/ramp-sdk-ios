@@ -64,13 +64,13 @@ public final class RampViewController: UIViewController {
     }
     
     private func showCloseAlert() {
-        let alert = UIAlertController(title: Constants.closeAlertTitle,
-                                      message: Constants.closeAlertMessage, preferredStyle: .alert)
+        let alert = UIAlertController(title: NSLocalizedString("Do you really want to close Ramp?", comment: "Alert title for closing Ramp"),
+                                      message: NSLocalizedString("You will loose all progress and will have to start over", comment: "Alert message for closing Ramp"),
+                                      preferredStyle: .alert)
         alert.view.tintColor = .rampColor
-        let yesAction = UIAlertAction(title: Constants.closeAlertYesAction, style: .destructive) { [unowned self]  _ in
-            self.closeRamp()
-        }
-        let noAction = UIAlertAction(title: Constants.closeAlertNoAction, style: .cancel)
+        let yesAction = UIAlertAction(title: NSLocalizedString("yes", comment: "Yes"),
+                                      style: .destructive) { [unowned self] _ in self.closeRamp() }
+        let noAction = UIAlertAction(title: NSLocalizedString("no", comment: "No"), style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
         present(alert, animated: true)
