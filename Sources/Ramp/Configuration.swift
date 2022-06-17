@@ -2,7 +2,10 @@ import Foundation
 
 /// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.ramp.network/configuration)
 public struct Configuration {
-    public enum Flow: String, CaseIterable { case onramp, offramp }
+    public enum Flow: String, CaseIterable {
+        case onramp = "ONRAMP"
+        case offramp = "OFFRAMP"
+    }
     
     /// main URL
     public var url: String = Constants.defaultUrl
@@ -12,7 +15,7 @@ public struct Configuration {
     public var deepLinkScheme: String? = nil
     public var defaultAsset: String? = nil
     public var defaultFlow: Flow? = nil
-    public var enabledFlow: [Flow]? = nil
+    public var enabledFlows: [Flow]? = nil
     public var fiatCurrency: String? = nil
     public var fiatValue: String? = nil
     public var finalUrl: String? = nil
@@ -42,7 +45,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
         urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow?.rawValue)
-        urlComponents.appendQueryItem(name: "enabledFlow", value: enabledFlow?.map(\.rawValue).joined(separator: ","))
+        urlComponents.appendQueryItem(name: "enabledFlows", value: enabledFlows?.map(\.rawValue).joined(separator: ","))
         urlComponents.appendQueryItem(name: "fiatCurrency", value: fiatCurrency)
         urlComponents.appendQueryItem(name: "fiatValue", value: fiatValue)
         urlComponents.appendQueryItem(name: "finalUrl", value: finalUrl)
