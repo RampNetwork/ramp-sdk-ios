@@ -68,9 +68,9 @@ public final class RampViewController: UIViewController {
                                       message: NSLocalizedString("You will loose all progress and will have to start over", comment: "Alert message for closing Ramp"),
                                       preferredStyle: .alert)
         alert.view.tintColor = .rampColor
-        let yesAction = UIAlertAction(title: NSLocalizedString("yes", comment: "Yes"),
+        let yesAction = UIAlertAction(title: NSLocalizedString("Yes", comment: "Yes"),
                                       style: .destructive) { [unowned self] _ in self.closeRamp() }
-        let noAction = UIAlertAction(title: NSLocalizedString("no", comment: "No"), style: .cancel)
+        let noAction = UIAlertAction(title: NSLocalizedString("No", comment: "No"), style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
         present(alert, animated: true)

@@ -31,7 +31,6 @@ public struct Configuration {
     public let variant: String = Constants.sdkVariant
     public var webhookStatusUrl: String? = nil
     
-    
     public init() {}
 }
 
