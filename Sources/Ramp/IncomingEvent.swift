@@ -68,9 +68,9 @@ struct WidgetClosePayload: Decodable {
 }
 
 public struct SendCryptoPayload: Decodable {
-    let assetSymbol: String
-    let amount: String
-    let address: String
+    public let assetSymbol: String
+    public let amount: String
+    public let address: String
 }
 
 struct OffRampPurchaseCreatedPayload: Decodable {
