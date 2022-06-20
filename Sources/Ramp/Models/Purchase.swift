@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RampPurchase: Decodable {
+public struct Purchase: Decodable {
     public let id: String
     public let endTime: String
     public let asset: AssetInfo

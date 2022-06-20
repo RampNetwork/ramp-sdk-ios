@@ -3,9 +3,9 @@ import Foundation
 enum IncomingEvent {
     case kycInit(KycInitPayload)
     case purchaseCreated(PurchaseCreatedPayload)
-    case purchaseFailed
     case widgetClose(WidgetClosePayload)
-    case offrampRequested(OfframpRequest)
+    case sendCrypto(SendCryptoPayload)
+    case offRampPurchaseCreated(OffRampPurchaseCreatedPayload)
 }
 
 extension IncomingEvent: DictionaryDecodable {
@@ -15,7 +15,7 @@ extension IncomingEvent: DictionaryDecodable {
         guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
         let payload = dictionary["payload"]
         switch eventType {
-        
+            
         case "KYC_INIT":
             guard let payload = payload else { throw Error.missingPayload }
             let decoded: KycInitPayload = try decoder.decode(payload)
@@ -26,17 +26,20 @@ extension IncomingEvent: DictionaryDecodable {
             let decoded: PurchaseCreatedPayload = try decoder.decode(payload)
             self = .purchaseCreated(decoded)
             
-        case "PURCHASE_FAILED": self = .purchaseFailed
-            
         case "WIDGET_CLOSE":
             guard let payload = payload else { throw Error.missingPayload }
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
-        case "OFFRAMP_REQUESTED":
+        case "SEND_CRYPTO":
             guard let payload = payload else { throw Error.missingPayload }
-            let decoded: OfframpRequest = try decoder.decode(payload)
-            self = .offrampRequested(decoded)
+            let decoded: SendCryptoPayload = try decoder.decode(payload)
+            self = .sendCrypto(decoded)
+            
+        case "OFFRAMP_PURCHASE_CREATED":
+            guard let payload = payload else { throw Error.missingPayload }
+            let decoded: OffRampPurchaseCreatedPayload = try decoder.decode(payload)
+            self = .offRampPurchaseCreated(decoded)
             
         default: throw Error.unhandledType
         }
@@ -57,9 +60,21 @@ struct KycInitPayload: Decodable {
 struct PurchaseCreatedPayload: Decodable {
     let apiUrl: URL
     let purchaseViewToken: String
-    let purchase: RampPurchase
+    let purchase: Purchase
 }
 
 struct WidgetClosePayload: Decodable {
     let showAlert: Bool
+}
+
+public struct SendCryptoPayload: Decodable {
+    let assetSymbol: String
+    let amount: String
+    let address: String
+}
+
+struct OffRampPurchaseCreatedPayload: Decodable {
+    let apiUrl: URL
+    let purchaseViewToken: String
+    let offRampPurchase: OffRampPurchase
 }

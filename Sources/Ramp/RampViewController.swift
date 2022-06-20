@@ -4,7 +4,7 @@ import Passbase
 
 public final class RampViewController: UIViewController {
     private let url: URL
-
+    
     private weak var webView: WKWebView!
     private weak var stackView: UIStackView!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
@@ -38,7 +38,7 @@ public final class RampViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
-         setupSwipeBackGesture()
+        setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -83,7 +83,7 @@ public final class RampViewController: UIViewController {
     }
     
     // MARK: Message handling
-        
+    
     private func subscribeMessageHandler() {
         let handler = ScriptMessageHandler()
         handler.delegate = self
@@ -103,12 +103,10 @@ public final class RampViewController: UIViewController {
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
         case .kycInit(let payload): startPassbaseFlow(payload)
-        case .purchaseCreated(let payload):
-            delegate?.ramp(self, didCreatePurchase: payload.purchase,
-                           purchaseViewToken: payload.purchaseViewToken, apiUrl: payload.apiUrl)
-        case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
+        case .purchaseCreated(let payload): delegate?.ramp(self, didCreate: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
-        case .offrampRequested(let request): offrampInfoRequested(request)
+        case .sendCrypto(let payload): handleSendCryptoEvent(payload)
+        case .offRampPurchaseCreated(let payload): delegate?.ramp(self, didCreate: payload.offRampPurchase, payload.purchaseViewToken, payload.apiUrl)
         }
     }
     
@@ -117,9 +115,10 @@ public final class RampViewController: UIViewController {
         else { closeRamp() }
     }
     
-    private func offrampInfoRequested(_ request: OfframpRequest) {
-        delegate?.ramp(self, didRequestOfframp: request) { response in
-            let event: OutgoingEvent = .offrampResponded(response)
+    private func handleSendCryptoEvent(_ payload: SendCryptoPayload) {
+        delegate?.ramp(self, didRequestOfframp: payload) { transactionHash in
+            let payload = SendCryptoResultPayload(txHash: transactionHash)
+            let event: OutgoingEvent = .sendCryptoResult(payload)
             self.sendOutgoingEvent(event)
         }
     }
