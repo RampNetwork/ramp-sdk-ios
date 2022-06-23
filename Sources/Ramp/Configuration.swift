@@ -28,6 +28,7 @@ public struct Configuration {
     public var swapAsset: String? = nil
     public var userAddress: String? = nil
     public var userEmailAddress: String? = nil
+    public var useSendCryptoCallback: Bool?
     public let variant: String = Constants.sdkVariant
     public var webhookStatusUrl: String? = nil
     
@@ -43,8 +44,14 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "containerNode", value: containerNode)
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
-        urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow?.rawValue)
-        urlComponents.appendQueryItem(name: "enabledFlows", value: enabledFlows?.map(\.rawValue).joined(separator: ","))
+        if let defaultFlow = defaultFlow {
+            let value = defaultFlow.rawValue
+            urlComponents.appendQueryItem(name: "defaultFlow", value: value)
+        }
+        if let enabledFlows = enabledFlows {
+            let value = enabledFlows.map(\.rawValue).joined(separator: ",")
+            urlComponents.appendQueryItem(name: "enabledFlows", value: value)
+        }
         urlComponents.appendQueryItem(name: "fiatCurrency", value: fiatCurrency)
         urlComponents.appendQueryItem(name: "fiatValue", value: fiatValue)
         urlComponents.appendQueryItem(name: "finalUrl", value: finalUrl)
@@ -57,6 +64,10 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "swapAsset", value: swapAsset)
         urlComponents.appendQueryItem(name: "userAddress", value: userAddress)
         urlComponents.appendQueryItem(name: "userEmailAddress", value: userEmailAddress)
+        if let useSendCryptoCallback = useSendCryptoCallback {
+            let value = useSendCryptoCallback ? "true" : "false"
+            urlComponents.appendQueryItem(name: "useSendCryptoCallback", value: value)
+        }
         urlComponents.appendQueryItem(name: "variant", value: variant)
         urlComponents.appendQueryItem(name: "webhookStatusUrl", value: webhookStatusUrl)
         
