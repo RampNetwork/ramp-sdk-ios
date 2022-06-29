@@ -103,10 +103,10 @@ public final class RampViewController: UIViewController {
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
         case .kycInit(let payload): startPassbaseFlow(payload)
-        case .purchaseCreated(let payload): delegate?.ramp(self, didCreate: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
+        case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
         case .sendCrypto(let payload): handleSendCryptoEvent(payload)
-        case .offRampPurchaseCreated(let payload): delegate?.ramp(self, didCreate: payload.offRampPurchase, payload.purchaseViewToken, payload.apiUrl)
+        case .offrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOfframpPurchase: payload.offrampPurchase, payload.purchaseViewToken, payload.apiUrl)
         }
     }
     

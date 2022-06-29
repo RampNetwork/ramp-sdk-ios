@@ -1,6 +1,6 @@
 import Foundation
 
-public struct OffRampPurchase: Decodable {
+public struct OfframpPurchase: Decodable {
     public let id: String
     public let createdAt: String
     public let crypto: Crypto

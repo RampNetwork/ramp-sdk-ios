@@ -5,7 +5,7 @@ enum IncomingEvent {
     case purchaseCreated(PurchaseCreatedPayload)
     case widgetClose(WidgetClosePayload)
     case sendCrypto(SendCryptoPayload)
-    case offRampPurchaseCreated(OffRampPurchaseCreatedPayload)
+    case offrampPurchaseCreated(OfframpPurchaseCreatedPayload)
 }
 
 extension IncomingEvent: DictionaryDecodable {
@@ -38,8 +38,8 @@ extension IncomingEvent: DictionaryDecodable {
             
         case "OFFRAMP_PURCHASE_CREATED":
             guard let payload = payload else { throw Error.missingPayload }
-            let decoded: OffRampPurchaseCreatedPayload = try decoder.decode(payload)
-            self = .offRampPurchaseCreated(decoded)
+            let decoded: OfframpPurchaseCreatedPayload = try decoder.decode(payload)
+            self = .offrampPurchaseCreated(decoded)
             
         default: throw Error.unhandledType
         }
@@ -73,8 +73,8 @@ public struct SendCryptoPayload: Decodable {
     public let address: String
 }
 
-struct OffRampPurchaseCreatedPayload: Decodable {
+struct OfframpPurchaseCreatedPayload: Decodable {
     let apiUrl: URL
     let purchaseViewToken: String
-    let offRampPurchase: OffRampPurchase
+    let offrampPurchase: OfframpPurchase
 }
