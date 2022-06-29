@@ -81,6 +81,10 @@ struct KycErrorPayload: Encodable {
     let verificationId: Int
 }
 
-struct SendCryptoResultPayload: Encodable {
+public struct SendCryptoResultPayload: Encodable {
     let txHash: String?
+    
+    public init(txHash: String? = nil) {
+        self.txHash = txHash
+    }
 }
