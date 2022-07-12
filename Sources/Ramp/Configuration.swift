@@ -1,8 +1,8 @@
 import Foundation
 
 /// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.ramp.network/configuration)
-public struct Configuration {
-    public enum Flow: String, CaseIterable {
+public struct Configuration: Decodable { // Decodable conformance is used in Flutter
+    public enum Flow: String, CaseIterable, Decodable { // Decodable conformance is used in Flutter
         case onramp = "ONRAMP"
         case offramp = "OFFRAMP"
     }
@@ -11,28 +11,30 @@ public struct Configuration {
     public var url: String = Constants.defaultUrl
     
     /// query params
-    public var containerNode: String? = nil
-    public var deepLinkScheme: String? = nil
-    public var defaultAsset: String? = nil
-    public var defaultFlow: Flow? = nil
-    public var enabledFlows: [Flow]? = nil
-    public var fiatCurrency: String? = nil
-    public var fiatValue: String? = nil
-    public var finalUrl: String? = nil
-    public var hostApiKey: String? = nil
-    public var hostAppName: String? = nil
-    public var hostLogoUrl: String? = nil
-    public var offrampWebhookV3Url: String? = nil
-    public var selectedCountryCode: String? = nil
-    public var swapAmount: String? = nil
-    public var swapAsset: String? = nil
-    public var userAddress: String? = nil
-    public var userEmailAddress: String? = nil
+    public var containerNode: String?
+    public var deepLinkScheme: String?
+    public var defaultAsset: String?
+    public var defaultFlow: Flow?
+    public var enabledFlows: [Flow]?
+    public var fiatCurrency: String?
+    public var fiatValue: String?
+    public var finalUrl: String?
+    public var hostApiKey: String?
+    public var hostAppName: String?
+    public var hostLogoUrl: String?
+    public var offrampWebhookV3Url: String?
+    public var selectedCountryCode: String?
+    public var swapAmount: String?
+    public var swapAsset: String?
+    public var userAddress: String?
+    public var userEmailAddress: String?
     public var useSendCryptoCallback: Bool?
-    public let variant: String = Constants.sdkVariant
-    public var webhookStatusUrl: String? = nil
+    public let variant: String
+    public var webhookStatusUrl: String?
     
-    public init() {}
+    public init() {
+        variant = Constants.sdkVariant
+    }
 }
 
 extension Configuration {
@@ -40,6 +42,7 @@ extension Configuration {
     
     func buildUrl() throws -> URL {
         guard var urlComponents = URLComponents(string: url) else { throw Error.invalidUrl }
+        urlComponents.path = "/"
         
         urlComponents.appendQueryItem(name: "containerNode", value: containerNode)
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)
