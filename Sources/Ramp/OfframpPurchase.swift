@@ -1,16 +1,16 @@
 import Foundation
 
-public struct OfframpPurchase: Decodable {
+public struct OfframpPurchase: Decodable & Encodable { // Encodable conformance is used in Flutter
     public let id: String
     public let createdAt: String
     public let crypto: Crypto
     public let fiat: Fiat
     
-    public struct Crypto: Decodable {
+    public struct Crypto: Decodable & Encodable { // Encodable conformance is used in Flutter
         public let amount: String
         public let assetInfo: AssetInfo
         
-        public struct AssetInfo: Decodable {
+        public struct AssetInfo: Decodable & Encodable { // Encodable conformance is used in Flutter
             public let address: String?
             public let symbol: String
             public let chain: String
@@ -20,7 +20,7 @@ public struct OfframpPurchase: Decodable {
         }
     }
     
-    public struct Fiat: Decodable {
+    public struct Fiat: Decodable & Encodable { // Encodable conformance is used in Flutter
         public let amount: Double
         public let currencySymbol: String
     }
