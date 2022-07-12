@@ -1,6 +1,7 @@
 import Foundation
 
 enum IncomingEvent {
+    case widgetConfigDone
     case kycInit(KycInitPayload)
     case purchaseCreated(PurchaseCreatedPayload)
     case widgetClose(WidgetClosePayload)
@@ -15,6 +16,9 @@ extension IncomingEvent: DictionaryDecodable {
         guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
         let payload = dictionary["payload"]
         switch eventType {
+            
+        case "WIDGET_CONFIG_DONE":
+            self = .widgetConfigDone
             
         case "KYC_INIT":
             guard let payload = payload else { throw Error.missingPayload }
