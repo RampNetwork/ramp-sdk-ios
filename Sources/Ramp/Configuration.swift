@@ -29,12 +29,10 @@ public struct Configuration: Decodable { // Decodable conformance is used in Flu
     public var userAddress: String?
     public var userEmailAddress: String?
     public var useSendCryptoCallback: Bool?
-    public let variant: String
+    public var variant: String { Constants.sdkVariant }
     public var webhookStatusUrl: String?
     
-    public init() {
-        variant = Constants.sdkVariant
-    }
+    public init() {}
 }
 
 extension Configuration {
