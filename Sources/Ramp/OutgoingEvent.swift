@@ -51,7 +51,7 @@ extension OutgoingEvent: MessageEventEncodable {
         if let payloadData = payloadData { payload = try JSONSerialization.jsonObject(with: payloadData) }
         else { payload = nil }
         let dictionary = ["type": type, "payload": payload]
-        let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: [.sortedKeys])
+        let jsonData = try JSONSerialization.data(withJSONObject: dictionary)
         if let jsonString = String(data: jsonData, encoding: .utf8) { return jsonString }
         else { throw Error.stringEncodingFailed }
     }

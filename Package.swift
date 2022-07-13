@@ -6,9 +6,6 @@ import PackageDescription
 let package = Package(
     name: "Ramp",
     defaultLocalization: "en",
-    platforms: [
-        .iOS(.v11)
-    ],
     products: [
         .library(name: "Ramp", targets: ["Ramp"])
     ],
