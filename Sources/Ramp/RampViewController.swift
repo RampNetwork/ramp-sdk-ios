@@ -4,7 +4,7 @@ import Passbase
 
 public final class RampViewController: UIViewController {
     private let url: URL
-
+    
     private weak var webView: WKWebView!
     private weak var stackView: UIStackView!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
@@ -38,7 +38,7 @@ public final class RampViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
-         setupSwipeBackGesture()
+        setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -64,13 +64,13 @@ public final class RampViewController: UIViewController {
     }
     
     private func showCloseAlert() {
-        let alert = UIAlertController(title: Constants.closeAlertTitle,
-                                      message: Constants.closeAlertMessage, preferredStyle: .alert)
-        alert.view.tintColor = Constants.rampColor
-        let yesAction = UIAlertAction(title: Constants.closeAlertYesAction, style: .destructive) { [unowned self]  _ in
-            self.closeRamp()
-        }
-        let noAction = UIAlertAction(title: Constants.closeAlertNoAction, style: .cancel)
+        let alert = UIAlertController(title: NSLocalizedString("Do you really want to close Ramp?", comment: "Alert title for closing Ramp"),
+                                      message: NSLocalizedString("You will loose all progress and will have to start over", comment: "Alert message for closing Ramp"),
+                                      preferredStyle: .alert)
+        alert.view.tintColor = .rampColor
+        let yesAction = UIAlertAction(title: NSLocalizedString("Yes", comment: "Yes"),
+                                      style: .destructive) { [unowned self] _ in self.closeRamp() }
+        let noAction = UIAlertAction(title: NSLocalizedString("No", comment: "No"), style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
         present(alert, animated: true)
@@ -83,7 +83,7 @@ public final class RampViewController: UIViewController {
     }
     
     // MARK: Message handling
-        
+    
     private func subscribeMessageHandler() {
         let handler = ScriptMessageHandler()
         handler.delegate = self
@@ -102,18 +102,25 @@ public final class RampViewController: UIViewController {
     
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
+        case .widgetConfigDone: delegate?.rampWidgetConfigDone(self)
         case .kycInit(let payload): startPassbaseFlow(payload)
-        case .purchaseCreated(let payload):
-            delegate?.ramp(self, didCreatePurchase: payload.purchase,
-                           purchaseViewToken: payload.purchaseViewToken, apiUrl: payload.apiUrl)
-        case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
+        case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
+        case .sendCrypto(let payload): handleSendCryptoEvent(payload)
+        case .offrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOfframpPurchase: payload.offrampPurchase, payload.purchaseViewToken, payload.apiUrl)
         }
     }
     
     private func handleCloseRampEvent(_ payload: WidgetClosePayload) {
         if payload.showAlert { showCloseAlert() }
         else { closeRamp() }
+    }
+    
+    private func handleSendCryptoEvent(_ payload: SendCryptoPayload) {
+        delegate?.ramp(self, didRequestOfframp: payload) { resultPayload in
+            let event: OutgoingEvent = .sendCryptoResult(resultPayload)
+            self.sendOutgoingEvent(event)
+        }
     }
     
     // MARK: Passbase actions
@@ -222,4 +229,8 @@ extension RampViewController: PassbaseDelegate {
         case .biometricAuthenticationFailed: handlePassbaseError()
         }
     }
+}
+
+private extension UIColor {
+    static var rampColor: UIColor { UIColor(red: 19/255.0, green: 159/255.0, blue: 106/255.0, alpha: 1) }
 }

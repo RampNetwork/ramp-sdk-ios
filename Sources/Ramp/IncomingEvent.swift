@@ -1,10 +1,12 @@
 import Foundation
 
 enum IncomingEvent {
+    case widgetConfigDone
     case kycInit(KycInitPayload)
     case purchaseCreated(PurchaseCreatedPayload)
-    case purchaseFailed
     case widgetClose(WidgetClosePayload)
+    case sendCrypto(SendCryptoPayload)
+    case offrampPurchaseCreated(OfframpPurchaseCreatedPayload)
 }
 
 extension IncomingEvent: DictionaryDecodable {
@@ -14,7 +16,10 @@ extension IncomingEvent: DictionaryDecodable {
         guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
         let payload = dictionary["payload"]
         switch eventType {
-        
+            
+        case "WIDGET_CONFIG_DONE":
+            self = .widgetConfigDone
+            
         case "KYC_INIT":
             guard let payload = payload else { throw Error.missingPayload }
             let decoded: KycInitPayload = try decoder.decode(payload)
@@ -25,12 +30,20 @@ extension IncomingEvent: DictionaryDecodable {
             let decoded: PurchaseCreatedPayload = try decoder.decode(payload)
             self = .purchaseCreated(decoded)
             
-        case "PURCHASE_FAILED": self = .purchaseFailed
-            
         case "WIDGET_CLOSE":
             guard let payload = payload else { throw Error.missingPayload }
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
+            
+        case "SEND_CRYPTO":
+            guard let payload = payload else { throw Error.missingPayload }
+            let decoded: SendCryptoPayload = try decoder.decode(payload)
+            self = .sendCrypto(decoded)
+            
+        case "OFFRAMP_PURCHASE_CREATED":
+            guard let payload = payload else { throw Error.missingPayload }
+            let decoded: OfframpPurchaseCreatedPayload = try decoder.decode(payload)
+            self = .offrampPurchaseCreated(decoded)
             
         default: throw Error.unhandledType
         }
@@ -51,9 +64,21 @@ struct KycInitPayload: Decodable {
 struct PurchaseCreatedPayload: Decodable {
     let apiUrl: URL
     let purchaseViewToken: String
-    let purchase: RampPurchase
+    let purchase: Purchase
 }
 
 struct WidgetClosePayload: Decodable {
     let showAlert: Bool
+}
+
+public struct SendCryptoPayload: Decodable {
+    public let assetSymbol: String
+    public let amount: String
+    public let address: String
+}
+
+struct OfframpPurchaseCreatedPayload: Decodable {
+    let apiUrl: URL
+    let purchaseViewToken: String
+    let offrampPurchase: OfframpPurchase
 }

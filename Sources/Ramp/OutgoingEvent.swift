@@ -7,6 +7,7 @@ enum OutgoingEvent {
     case kycAborted(KycAbortedPayload)
     case kycError(KycErrorPayload)
     case backButtonPressed
+    case sendCryptoResult(SendCryptoResultPayload)
 }
 
 extension OutgoingEvent: MessageEventEncodable {
@@ -16,7 +17,7 @@ extension OutgoingEvent: MessageEventEncodable {
         let type: String
         let payloadData: Data?
         switch self {
-        
+            
         case .kycStarted(let payload):
             type = "KYC_STARTED"
             payloadData = try encoder.encode(payload)
@@ -40,6 +41,10 @@ extension OutgoingEvent: MessageEventEncodable {
         case .backButtonPressed:
             type = "BACK_BUTTON_PRESSED"
             payloadData = nil
+            
+        case .sendCryptoResult(let payload):
+            type = "SEND_CRYPTO_RESULT"
+            payloadData = try encoder.encode(payload)
         }
         
         let payload: Any?
@@ -74,4 +79,12 @@ struct KycAbortedPayload: Encodable {
 
 struct KycErrorPayload: Encodable {
     let verificationId: Int
+}
+
+public struct SendCryptoResultPayload: Encodable {
+    let txHash: String?
+    
+    public init(txHash: String? = nil) {
+        self.txHash = txHash
+    }
 }
