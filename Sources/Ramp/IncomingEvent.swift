@@ -87,10 +87,6 @@ extension IncomingEvent {
         case missingType, missingPayload, missingVersion
         case unhandledType(String), unhandledVersion(Int)
     }
-    
-    struct Constants {
-        static let sendCryptoPayloadVersion: Int = 1
-    }
 }
 
 // MARK: - Payloads

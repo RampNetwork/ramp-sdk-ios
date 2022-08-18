@@ -64,8 +64,8 @@ public final class RampViewController: UIViewController {
     }
     
     private func showCloseAlert() {
-        let alert = UIAlertController(title: Localizable.closeAlertTitle
-                                      message: Localizable.closeAlertMessage
+        let alert = UIAlertController(title: Localizable.closeAlertTitle,
+                                      message: Localizable.closeAlertMessage,
                                       preferredStyle: .alert)
         alert.view.tintColor = .rampColor
         let yesAction = UIAlertAction(title: Localizable.yes,

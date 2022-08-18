@@ -1,11 +1,7 @@
 import Foundation
 
 /// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.ramp.network/configuration)
-public struct Configuration: Decodable { // Decodable conformance is used in Flutter
-    public enum Flow: String, CaseIterable, Decodable { // Decodable conformance is used in Flutter
-        case onramp = "ONRAMP"
-        case offramp = "OFFRAMP"
-    }
+public struct Configuration: Decodable {
     
     /// main URL
     public var url: String = Constants.defaultUrl
@@ -15,7 +11,7 @@ public struct Configuration: Decodable { // Decodable conformance is used in Flu
     public var deepLinkScheme: String?
     public var defaultAsset: String?
     public var defaultFlow: Flow?
-    public var enabledFlows: [Flow]?
+    public var enabledFlows: Set<Flow>?
     public var fiatCurrency: String?
     public var fiatValue: String?
     public var finalUrl: String?
@@ -29,7 +25,6 @@ public struct Configuration: Decodable { // Decodable conformance is used in Flu
     public var userAddress: String?
     public var userEmailAddress: String?
     public var useSendCryptoCallback: Bool?
-    public var useSendCryptoCallbackVersion: Int?
     public var variant: String { Constants.sdkVariant }
     public var webhookStatusUrl: String?
     
@@ -37,8 +32,6 @@ public struct Configuration: Decodable { // Decodable conformance is used in Flu
 }
 
 extension Configuration {
-    public enum Error: Swift.Error { case invalidUrl, invalidParameters }
-    
     func buildUrl() throws -> URL {
         guard var urlComponents = URLComponents(string: url) else { throw Error.invalidUrl }
         urlComponents.path = "/"
@@ -46,9 +39,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "containerNode", value: containerNode)
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
-        if let defaultFlow = defaultFlow {
-            urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow.rawValue)
-        }
+        urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow)
         if let enabledFlows = enabledFlows {
             let value = enabledFlows.map(\.rawValue).joined(separator: ",")
             urlComponents.appendQueryItem(name: "enabledFlows", value: value)
@@ -65,12 +56,9 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "swapAsset", value: swapAsset)
         urlComponents.appendQueryItem(name: "userAddress", value: userAddress)
         urlComponents.appendQueryItem(name: "userEmailAddress", value: userEmailAddress)
-        if let useSendCryptoCallback = useSendCryptoCallback {
-            let value = useSendCryptoCallback ? "true" : "false"
-            urlComponents.appendQueryItem(name: "useSendCryptoCallback", value: value)
-        }
-        if let useSendCryptoCallbackVersion = useSendCryptoCallbackVersion {
-            urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion", value: String(useSendCryptoCallbackVersion))
+        if useSendCryptoCallback == true {
+            urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion",
+                                          value: Constants.sendCryptoPayloadVersion)
         }
         urlComponents.appendQueryItem(name: "variant", value: variant)
         urlComponents.appendQueryItem(name: "webhookStatusUrl", value: webhookStatusUrl)
@@ -78,4 +66,13 @@ extension Configuration {
         if let url = urlComponents.url { return url }
         else { throw Error.invalidParameters }
     }
+}
+
+public extension Configuration {
+    enum Flow: String, CaseIterable, Decodable {
+        case onramp = "ONRAMP"
+        case offramp = "OFFRAMP"
+    }
+    
+    enum Error: Swift.Error { case invalidUrl, invalidParameters }
 }
