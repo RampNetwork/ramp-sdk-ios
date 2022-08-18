@@ -183,11 +183,7 @@ extension RampViewController: WKUIDelegate {
     public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
         let app = UIApplication.shared
         if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) {
-            if #available(iOS 10.0, *) {
-                app.open(navigationUrl)
-            } else {
-                app.openURL(navigationUrl)
-            }
+            app.open(navigationUrl)
         }
         return nil
     }
