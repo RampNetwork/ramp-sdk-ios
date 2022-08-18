@@ -68,12 +68,6 @@ extension IncomingEvent: DictionaryDecodable {
 // MARK: - Types
 
 extension IncomingEvent {
-    struct CodingKeys {
-        static let payload = "payload"
-        static let type = "type"
-        static let version = "eventVersion"
-    }
-    
     struct EventTypes {
         static let widgetConfigDone = "WIDGET_CONFIG_DONE"
         static let kycInit = "KYC_INIT"
@@ -81,6 +75,12 @@ extension IncomingEvent {
         static let widgetClose = "WIDGET_CLOSE"
         static let sendCrypto = "SEND_CRYPTO"
         static let offrampPurchaseCreated = "OFFRAMP_PURCHASE_CREATED"
+    }
+    
+    struct CodingKeys {
+        static let payload = "payload"
+        static let type = "type"
+        static let version = "eventVersion"
     }
     
     enum Error: Swift.Error {

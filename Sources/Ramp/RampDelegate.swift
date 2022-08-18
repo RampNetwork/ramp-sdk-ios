@@ -7,3 +7,7 @@ public protocol RampDelegate: AnyObject {
     func ramp(_ rampViewController: RampViewController, didCreateOfframpPurchase purchase: OfframpPurchase, _ purchaseViewToken: String, _ apiUrl: URL)
     func rampDidClose(_ rampViewController: RampViewController)
 }
+
+public extension RampDelegate {
+    func rampWidgetConfigDone(_ rampViewController: RampViewController) { }
+}

@@ -17,7 +17,7 @@ let encoder = JSONEncoder()
 let decoder = JSONDecoder()
 
 extension JSONDecoder {
-    func decode<T: Decodable>(_ payload: Any) throws -> T {
+    func decode<T: Decodable>(_ payload: [String: Any]) throws -> T {
         let data = try JSONSerialization.data(withJSONObject: payload)
         let decoded = try decode(T.self, from: data)
         return decoded
