@@ -29,6 +29,7 @@ public struct Configuration: Decodable { // Decodable conformance is used in Flu
     public var userAddress: String?
     public var userEmailAddress: String?
     public var useSendCryptoCallback: Bool?
+    public var useSendCryptoCallbackVersion: Int?
     public var variant: String { Constants.sdkVariant }
     public var webhookStatusUrl: String?
     
@@ -46,8 +47,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
         if let defaultFlow = defaultFlow {
-            let value = defaultFlow.rawValue
-            urlComponents.appendQueryItem(name: "defaultFlow", value: value)
+            urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow.rawValue)
         }
         if let enabledFlows = enabledFlows {
             let value = enabledFlows.map(\.rawValue).joined(separator: ",")
@@ -68,6 +68,9 @@ extension Configuration {
         if let useSendCryptoCallback = useSendCryptoCallback {
             let value = useSendCryptoCallback ? "true" : "false"
             urlComponents.appendQueryItem(name: "useSendCryptoCallback", value: value)
+        }
+        if let useSendCryptoCallbackVersion = useSendCryptoCallbackVersion {
+            urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion", value: String(useSendCryptoCallbackVersion))
         }
         urlComponents.appendQueryItem(name: "variant", value: variant)
         urlComponents.appendQueryItem(name: "webhookStatusUrl", value: webhookStatusUrl)
