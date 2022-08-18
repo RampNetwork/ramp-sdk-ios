@@ -64,13 +64,13 @@ public final class RampViewController: UIViewController {
     }
     
     private func showCloseAlert() {
-        let alert = UIAlertController(title: NSLocalizedString("Do you really want to close Ramp?", comment: "Alert title for closing Ramp"),
-                                      message: NSLocalizedString("You will loose all progress and will have to start over", comment: "Alert message for closing Ramp"),
+        let alert = UIAlertController(title: Localizable.closeAlertTitle
+                                      message: Localizable.closeAlertMessage
                                       preferredStyle: .alert)
         alert.view.tintColor = .rampColor
-        let yesAction = UIAlertAction(title: NSLocalizedString("Yes", comment: "Yes"),
+        let yesAction = UIAlertAction(title: Localizable.yes,
                                       style: .destructive) { [unowned self] _ in self.closeRamp() }
-        let noAction = UIAlertAction(title: NSLocalizedString("No", comment: "No"), style: .cancel)
+        let noAction = UIAlertAction(title: Localizable.no, style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
         present(alert, animated: true)
@@ -104,7 +104,7 @@ public final class RampViewController: UIViewController {
         switch event {
         case .widgetConfigDone: delegate?.rampWidgetConfigDone(self)
         case .kycInit(let payload): startPassbaseFlow(payload)
-        case .purchaseCreated(let payload): delegate?.ramp(self, didCreatePurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
+        case .onrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOnrampPurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
         case .sendCrypto(let payload): handleSendCryptoEvent(payload)
         case .offrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOfframpPurchase: payload.offrampPurchase, payload.purchaseViewToken, payload.apiUrl)

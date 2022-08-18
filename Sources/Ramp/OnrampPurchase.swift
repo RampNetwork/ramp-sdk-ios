@@ -1,6 +1,6 @@
 import Foundation
 
-public struct Purchase: Decodable & Encodable { // Encodable conformance is used in Flutter
+public struct OnrampPurchase: Codable {
     public let id: String
     public let endTime: String
     public let asset: AssetInfo
@@ -20,7 +20,7 @@ public struct Purchase: Decodable & Encodable { // Encodable conformance is used
     public let escrowAddress: String?
     public let escrowDetailsHash: String?
     
-    public struct AssetInfo: Decodable & Encodable { // Encodable conformance is used in Flutter
+    public struct AssetInfo: Codable {
         public let address: String?
         public let decimals: Int
         public let name: String

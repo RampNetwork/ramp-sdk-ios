@@ -3,54 +3,97 @@ import Foundation
 enum IncomingEvent {
     case widgetConfigDone
     case kycInit(KycInitPayload)
-    case purchaseCreated(PurchaseCreatedPayload)
+    case onrampPurchaseCreated(OnrampPurchaseCreatedPayload)
     case widgetClose(WidgetClosePayload)
     case sendCrypto(SendCryptoPayload)
     case offrampPurchaseCreated(OfframpPurchaseCreatedPayload)
 }
 
 extension IncomingEvent: DictionaryDecodable {
-    enum Error: Swift.Error { case missingType, missingPayload, unhandledType }
     
     init(dictionary: [String: Any]) throws {
-        guard let eventType = dictionary["type"] as? String else { throw Error.missingType }
-        let payload = dictionary["payload"]
-        switch eventType {
+        guard let type = dictionary[CodingKeys.type] as? String
+        else { throw Error.missingType }
+        
+        switch type {
             
-        case "WIDGET_CONFIG_DONE":
+        case EventTypes.widgetConfigDone:
             self = .widgetConfigDone
             
-        case "KYC_INIT":
-            guard let payload = payload else { throw Error.missingPayload }
+        case EventTypes.kycInit:
+            guard let payload = dictionary[CodingKeys.payload] as? [String: Any]
+            else { throw Error.missingPayload }
+            
             let decoded: KycInitPayload = try decoder.decode(payload)
             self = .kycInit(decoded)
             
-        case "PURCHASE_CREATED":
-            guard let payload = payload else { throw Error.missingPayload }
-            let decoded: PurchaseCreatedPayload = try decoder.decode(payload)
-            self = .purchaseCreated(decoded)
+        case EventTypes.onrampPurchaseCreated:
+            guard let payload = dictionary[CodingKeys.payload]  as? [String: Any]
+            else { throw Error.missingPayload }
             
-        case "WIDGET_CLOSE":
-            guard let payload = payload else { throw Error.missingPayload }
+            let decoded: OnrampPurchaseCreatedPayload = try decoder.decode(payload)
+            self = .onrampPurchaseCreated(decoded)
+            
+        case EventTypes.widgetClose:
+            guard let payload = dictionary[CodingKeys.payload]  as? [String: Any]
+            else { throw Error.missingPayload }
+            
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
-        case "SEND_CRYPTO":
-            guard let payload = payload else { throw Error.missingPayload }
+        case EventTypes.sendCrypto:
+            guard let payload = dictionary[CodingKeys.payload]  as? [String: Any]
+            else { throw Error.missingPayload }
+            guard let version = dictionary[CodingKeys.version] as? Int
+            else { throw Error.missingVersion }
+            guard version == Constants.sendCryptoPayloadVersion
+            else { throw Error.unhandledVersion(version) }
+            
             let decoded: SendCryptoPayload = try decoder.decode(payload)
             self = .sendCrypto(decoded)
             
-        case "OFFRAMP_PURCHASE_CREATED":
-            guard let payload = payload else { throw Error.missingPayload }
+        case EventTypes.offrampPurchaseCreated:
+            guard let payload = dictionary[CodingKeys.payload] as? [String: Any]
+            else { throw Error.missingPayload }
+            
             let decoded: OfframpPurchaseCreatedPayload = try decoder.decode(payload)
             self = .offrampPurchaseCreated(decoded)
             
-        default: throw Error.unhandledType
+        default:
+            throw Error.unhandledType(type)
         }
     }
 }
 
-// MARK: Payloads
+// MARK: - Types
+
+extension IncomingEvent {
+    struct CodingKeys {
+        static let payload = "payload"
+        static let type = "type"
+        static let version = "eventVersion"
+    }
+    
+    struct EventTypes {
+        static let widgetConfigDone = "WIDGET_CONFIG_DONE"
+        static let kycInit = "KYC_INIT"
+        static let onrampPurchaseCreated = "PURCHASE_CREATED"
+        static let widgetClose = "WIDGET_CLOSE"
+        static let sendCrypto = "SEND_CRYPTO"
+        static let offrampPurchaseCreated = "OFFRAMP_PURCHASE_CREATED"
+    }
+    
+    enum Error: Swift.Error {
+        case missingType, missingPayload, missingVersion
+        case unhandledType(String), unhandledVersion(Int)
+    }
+    
+    struct Constants {
+        static let sendCryptoPayloadVersion: Int = 1
+    }
+}
+
+// MARK: - Payloads
 
 struct KycInitPayload: Decodable {
     let email: String
@@ -61,10 +104,10 @@ struct KycInitPayload: Decodable {
     let metaData: String?
 }
 
-struct PurchaseCreatedPayload: Decodable {
+struct OnrampPurchaseCreatedPayload: Decodable {
     let apiUrl: URL
     let purchaseViewToken: String
-    let purchase: Purchase
+    let purchase: OnrampPurchase
 }
 
 struct WidgetClosePayload: Decodable {
