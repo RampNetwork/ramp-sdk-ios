@@ -40,10 +40,12 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
         urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow)
+        
         if let enabledFlows = enabledFlows {
             let value = enabledFlows.map(\.rawValue).joined(separator: ",")
             urlComponents.appendQueryItem(name: "enabledFlows", value: value)
         }
+        
         urlComponents.appendQueryItem(name: "fiatCurrency", value: fiatCurrency)
         urlComponents.appendQueryItem(name: "fiatValue", value: fiatValue)
         urlComponents.appendQueryItem(name: "finalUrl", value: finalUrl)
@@ -56,10 +58,12 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "swapAsset", value: swapAsset)
         urlComponents.appendQueryItem(name: "userAddress", value: userAddress)
         urlComponents.appendQueryItem(name: "userEmailAddress", value: userEmailAddress)
-        if useSendCryptoCallback == true {
+        
+        if case .some(let useCallback) = useSendCryptoCallback, useCallback {
             urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion",
                                           value: Constants.sendCryptoPayloadVersion)
         }
+        
         urlComponents.appendQueryItem(name: "variant", value: variant)
         urlComponents.appendQueryItem(name: "webhookStatusUrl", value: webhookStatusUrl)
         

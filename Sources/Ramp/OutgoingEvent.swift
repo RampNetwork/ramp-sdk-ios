@@ -56,17 +56,26 @@ extension OutgoingEvent: MessageEventEncodable {
         }
         
         let payload: Any?
-        if let payloadData = payloadData { payload = try JSONSerialization.jsonObject(with: payloadData) }
-        else { payload = nil }
+        if let payloadData = payloadData {
+            payload = try JSONSerialization.jsonObject(with: payloadData)
+        } else { payload = nil }
         
         var dictionary: [String: Any] = [CodingKeys.type: type]
-        if let payload = payload { dictionary[CodingKeys.payload] = payload }
-        if let version = version { dictionary[CodingKeys.version] = version }
+        if let payload {
+            dictionary[CodingKeys.payload] = payload
+        }
+        if let version {
+            dictionary[CodingKeys.version] = version
+        }
             
-        let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: .sortedKeys)
+        let jsonData = try JSONSerialization
+            .data(withJSONObject: dictionary, options: .sortedKeys)
         
-        if let jsonString = String(data: jsonData, encoding: .utf8) { return jsonString }
-        else { throw Error.stringEncodingFailed }
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            return jsonString
+        } else {
+            throw Error.stringEncodingFailed
+        }
     }
 }
 

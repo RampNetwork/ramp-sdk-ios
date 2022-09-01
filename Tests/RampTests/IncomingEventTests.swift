@@ -6,7 +6,10 @@ class IncomingEventTests: XCTestCase {
     func testCorrectWidgetConfigDone() throws {
         let payload = ["type": "WIDGET_CONFIG_DONE"]
         let event = try IncomingEvent(dictionary: payload)
-        if case .widgetConfigDone = event {} else { XCTFail() }
+        guard case .widgetConfigDone = event else {
+            XCTFail("Failed to decode WIDGET_CONFIG_DONE event")
+            return
+        }
     }
     
     func testCorrectWidgetClose() throws {
@@ -15,7 +18,9 @@ class IncomingEventTests: XCTestCase {
                                       "payload": ["showAlert": showAlert]]
         let event = try IncomingEvent(dictionary: payload)
         if case .widgetClose(let payload) = event {
-            XCTAssertEqual(payload.showAlert, showAlert)
+            XCTAssertEqual(payload.showAlert,
+                           showAlert,
+                           "WIDGET_CLOSE show alert flag incorrectly parsed")
         } else { XCTFail() }
     }
     
@@ -33,16 +38,19 @@ class IncomingEventTests: XCTestCase {
             XCTAssertEqual(payload.assetSymbol, assetSymbol)
             XCTAssertEqual(payload.amount, amount)
             XCTAssertEqual(payload.address, address)
-        } else { XCTFail() }
+        } else { XCTFail("Failed to decode SEND_CRYPTO event") }
     }
     
     func testMissingType() throws {
         let payload: [String: Any] = [:]
         do {
             let _ = try IncomingEvent(dictionary: payload)
-            XCTFail()
+            XCTFail("Incorrectly decoded undefined payload")
         } catch let error as IncomingEvent.Error {
-            if case .missingType = error {} else { XCTFail() }
+            guard case .missingType = error else {
+                XCTFail("Failed to throw invalid type error")
+                return
+            }
         }
     }
     
@@ -51,11 +59,13 @@ class IncomingEventTests: XCTestCase {
         let payload = ["type": invalidType]
         do {
             let _ = try IncomingEvent(dictionary: payload)
-            XCTFail()
+            XCTFail("Incorrectly decoded non-existent payload type")
         } catch let error as IncomingEvent.Error {
             if case .unhandledType(let type) = error {
                 XCTAssertEqual(type, invalidType)
-            } else { XCTFail() }
+            } else {
+                XCTFail("Incorrect error thrown, expected .unhandledType")
+            }
         }
     }
     
@@ -64,9 +74,12 @@ class IncomingEventTests: XCTestCase {
                                       "payload": emptyDictionary]
         do {
             let _ = try IncomingEvent(dictionary: payload)
-            XCTFail()
+            XCTFail("Incorrectly decoded SEND_CRYPTO payload with no version")
         } catch let error as IncomingEvent.Error {
-            if case .missingVersion = error {} else { XCTFail() }
+            guard case .missingVersion = error else {
+                XCTFail("Incorrect error thrown, expected .missingVersion")
+                return
+            }
         }
     }
     
@@ -77,11 +90,13 @@ class IncomingEventTests: XCTestCase {
                                       "eventVersion": invalidVersion]
         do {
             let _ = try IncomingEvent(dictionary: payload)
-            XCTFail()
+            XCTFail("Incorrectly decoded SEND_CRYPTO payload with invalidversion")
         } catch let error as IncomingEvent.Error {
             if case .unhandledVersion(let version) = error {
                 XCTAssertEqual(version, invalidVersion)
-            } else { XCTFail() }
+            } else {
+                XCTFail("Incorrect error thrown, expected .unhandledVersion")
+            }
         }
     }
 }

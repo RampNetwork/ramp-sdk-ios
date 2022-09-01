@@ -12,8 +12,11 @@ enum IncomingEvent {
 extension IncomingEvent: DictionaryDecodable {
     
     init(dictionary: [String: Any]) throws {
-        guard let type = dictionary[CodingKeys.type] as? String
-        else { throw Error.missingType }
+        let type = dictionary[CodingKeys.type] as? String
+        let payload = dictionary[CodingKeys.payload] as? [String: Any]
+        let version = dictionary[CodingKeys.version] as? Int
+        
+        guard let type else { throw Error.missingType }
         
         switch type {
             
@@ -21,40 +24,35 @@ extension IncomingEvent: DictionaryDecodable {
             self = .widgetConfigDone
             
         case EventTypes.kycInit:
-            guard let payload = dictionary[CodingKeys.payload] as? [String: Any]
-            else { throw Error.missingPayload }
+            guard let payload else { throw Error.missingPayload }
             
             let decoded: KycInitPayload = try decoder.decode(payload)
             self = .kycInit(decoded)
             
         case EventTypes.onrampPurchaseCreated:
-            guard let payload = dictionary[CodingKeys.payload]  as? [String: Any]
-            else { throw Error.missingPayload }
+            guard let payload else { throw Error.missingPayload }
             
             let decoded: OnrampPurchaseCreatedPayload = try decoder.decode(payload)
             self = .onrampPurchaseCreated(decoded)
             
         case EventTypes.widgetClose:
-            guard let payload = dictionary[CodingKeys.payload]  as? [String: Any]
-            else { throw Error.missingPayload }
+            guard let payload else { throw Error.missingPayload }
             
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
         case EventTypes.sendCrypto:
-            guard let payload = dictionary[CodingKeys.payload]  as? [String: Any]
-            else { throw Error.missingPayload }
-            guard let version = dictionary[CodingKeys.version] as? Int
-            else { throw Error.missingVersion }
-            guard version == Constants.sendCryptoPayloadVersion
-            else { throw Error.unhandledVersion(version) }
+            guard let payload else { throw Error.missingPayload }
+            guard let version else { throw Error.missingVersion }
+            guard version == Constants.sendCryptoPayloadVersion else {
+                throw Error.unhandledVersion(version)
+            }
             
             let decoded: SendCryptoPayload = try decoder.decode(payload)
             self = .sendCrypto(decoded)
             
         case EventTypes.offrampPurchaseCreated:
-            guard let payload = dictionary[CodingKeys.payload] as? [String: Any]
-            else { throw Error.missingPayload }
+            guard let payload else { throw Error.missingPayload }
             
             let decoded: OfframpPurchaseCreatedPayload = try decoder.decode(payload)
             self = .offrampPurchaseCreated(decoded)

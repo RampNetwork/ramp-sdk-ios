@@ -95,7 +95,8 @@ public final class RampViewController: UIViewController {
     }
     
     private func sendOutgoingEvent(_ event: OutgoingEvent) {
-        guard let message = try? event.messagePayload() else { return }
+        let message = try? event.messagePayload()
+        guard let message else { return }
         let script = Constants.postMessageScript(message)
         webView.evaluateJavaScript(script) { _, _ in }
     }
@@ -144,35 +145,35 @@ public final class RampViewController: UIViewController {
     // MARK: Passbase outgoing events
     
     private func handlePassbaseStarted() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycStartedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycStarted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSubmitted(identityAccessKey: String) {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycSubmittedPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSubmitted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSuccess(identityAccessKey: String) {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycSuccessPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSuccess(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseAborted() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycAbortedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycAborted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseError() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycErrorPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycError(payload)
         sendOutgoingEvent(event)
@@ -180,9 +181,13 @@ public final class RampViewController: UIViewController {
 }
 
 extension RampViewController: WKUIDelegate {
-    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+    public func webView(_ webView: WKWebView,
+                        createWebViewWith configuration: WKWebViewConfiguration,
+                        for navigationAction: WKNavigationAction,
+                        windowFeatures: WKWindowFeatures) -> WKWebView? {
         let app = UIApplication.shared
-        if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) {
+        if let navigationUrl = navigationAction.request.url,
+           app.canOpenURL(navigationUrl) {
             app.open(navigationUrl)
         }
         return nil
@@ -203,7 +208,8 @@ extension RampViewController {
 
 extension RampViewController: ScriptMessageDelegate {
     func handler(_ scriptMessageHandler: ScriptMessageHandler, didReceiveMessage body: [String : Any]) {
-        guard let event = try? IncomingEvent(dictionary: body) else { return }
+        let event = try? IncomingEvent(dictionary: body)
+        guard let event else { return }
         handleIncomingEvent(event)
     }
 }
@@ -225,7 +231,8 @@ extension RampViewController: PassbaseDelegate {
     }
     
     public func onError(errorCode: String) {
-        guard let error = PassbaseError(rawValue: errorCode) else { return }
+        let error = PassbaseError(rawValue: errorCode)
+        guard let error else { return }
         switch error {
         case .cancelledByUser: handlePassbaseAborted()
         case .biometricAuthenticationFailed: handlePassbaseError()
