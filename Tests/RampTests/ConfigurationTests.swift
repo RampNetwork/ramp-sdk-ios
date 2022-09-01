@@ -3,11 +3,13 @@ import XCTest
 
 class ConfigurationTests: XCTestCase {
     
-    static let defaultUrl = "https://buy.ramp.network/?variant=sdk-mobile"
+    struct Constants {
+        static let defaultUrl = "https://buy.ramp.network/?variant=sdk-mobile"
+    }
     
     func testEmptyConfiguration() throws {
         let configuration = Configuration()
         let url = try configuration.buildUrl()
-        XCTAssertEqual(url.absoluteString, Self.defaultUrl)
+        XCTAssertEqual(url.absoluteString, Constants.defaultUrl)
     }
 }
