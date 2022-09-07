@@ -61,10 +61,10 @@ extension OutgoingEvent: MessageEventEncodable {
         } else { payload = nil }
         
         var dictionary: [String: Any] = [CodingKeys.type: type]
-        if let payload {
+        if let payload = payload {
             dictionary[CodingKeys.payload] = payload
         }
-        if let version {
+        if let version = version {
             dictionary[CodingKeys.version] = version
         }
             
