@@ -40,9 +40,9 @@ extension IncomingEvent: DictionaryDecodable {
             
         case EventTypes.sendCrypto:
             guard let payload = payload  else { throw Error.missingPayload }
-            guard let version = version else { throw Error.missingVersion }
-            guard version == Constants.sendCryptoPayloadVersion else {
-                throw Error.unhandledVersion(version)
+            /// sendCrypto is loosely versioned, which means we accept no version or version 1 only
+            if let version = version, version != Constants.sendCryptoVersion {
+                throw Error.unhandledVersion(version, type)
             }
             let decoded: SendCryptoPayload = try decoder.decode(payload)
             self = .sendCrypto(decoded)
@@ -77,8 +77,8 @@ extension IncomingEvent {
     }
     
     enum Error: Swift.Error {
-        case missingType, missingPayload, missingVersion
-        case unhandledType(String), unhandledVersion(Int)
+        case missingType, missingPayload
+        case unhandledType(String), unhandledVersion(Int, String)
     }
 }
 

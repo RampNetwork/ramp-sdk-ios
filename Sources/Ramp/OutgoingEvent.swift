@@ -51,7 +51,7 @@ extension OutgoingEvent: MessageEventEncodable {
             
         case .sendCryptoResult(let payload):
             type = EventType.sendCryptoResult
-            version = Constants.sendCryptoPayloadVersion
+            version = Constants.sendCryptoVersion
             payloadData = try encoder.encode(payload)
         }
         

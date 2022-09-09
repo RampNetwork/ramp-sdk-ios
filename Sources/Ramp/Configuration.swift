@@ -61,7 +61,7 @@ extension Configuration {
         
         if case .some(let useCallback) = useSendCryptoCallback, useCallback {
             urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion",
-                                          value: Constants.sendCryptoPayloadVersion)
+                                          value: Constants.sendCryptoVersion)
         }
         
         urlComponents.appendQueryItem(name: "variant", value: variant)
