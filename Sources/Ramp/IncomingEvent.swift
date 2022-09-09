@@ -25,19 +25,16 @@ extension IncomingEvent: DictionaryDecodable {
             
         case EventTypes.kycInit:
             guard let payload = payload else { throw Error.missingPayload }
-            
             let decoded: KycInitPayload = try decoder.decode(payload)
             self = .kycInit(decoded)
             
         case EventTypes.onrampPurchaseCreated:
             guard let payload = payload  else { throw Error.missingPayload }
-            
             let decoded: OnrampPurchaseCreatedPayload = try decoder.decode(payload)
             self = .onrampPurchaseCreated(decoded)
             
         case EventTypes.widgetClose:
             guard let payload = payload  else { throw Error.missingPayload }
-            
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
@@ -47,13 +44,11 @@ extension IncomingEvent: DictionaryDecodable {
             guard version == Constants.sendCryptoPayloadVersion else {
                 throw Error.unhandledVersion(version)
             }
-            
             let decoded: SendCryptoPayload = try decoder.decode(payload)
             self = .sendCrypto(decoded)
             
         case EventTypes.offrampPurchaseCreated:
             guard let payload = payload  else { throw Error.missingPayload }
-            
             let decoded: OfframpPurchaseCreatedPayload = try decoder.decode(payload)
             self = .offrampPurchaseCreated(decoded)
             
