@@ -84,6 +84,7 @@ class IncomingEventTests: XCTestCase {
     }
     
     func testUnknownVersionInSendCryptoEvent() throws {
+        let validType = "SEND_CRYPTO"
         let invalidVersion = Int.random(in: 666...777)
         let payload: [String: Any] = ["type": "SEND_CRYPTO",
                                       "payload": emptyDictionary,
@@ -92,8 +93,9 @@ class IncomingEventTests: XCTestCase {
             let _ = try IncomingEvent(dictionary: payload)
             XCTFail("Incorrectly decoded SEND_CRYPTO payload with invalidversion")
         } catch let error as IncomingEvent.Error {
-            if case .unhandledVersion(let version) = error {
+            if case .unhandledVersion(let version, let type) = error {
                 XCTAssertEqual(version, invalidVersion)
+                XCTAssertEqual(type, validType)
             } else {
                 XCTFail("Incorrect error thrown, expected .unhandledVersion")
             }

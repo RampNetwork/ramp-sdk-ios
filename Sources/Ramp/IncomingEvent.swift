@@ -24,22 +24,22 @@ extension IncomingEvent: DictionaryDecodable {
             self = .widgetConfigDone
             
         case EventTypes.kycInit:
-            guard let payload = payload else { throw Error.missingPayload }
+            guard let payload = payload else { throw Error.missingPayload(type) }
             let decoded: KycInitPayload = try decoder.decode(payload)
             self = .kycInit(decoded)
             
         case EventTypes.onrampPurchaseCreated:
-            guard let payload = payload  else { throw Error.missingPayload }
+            guard let payload = payload  else { throw Error.missingPayload(type) }
             let decoded: OnrampPurchaseCreatedPayload = try decoder.decode(payload)
             self = .onrampPurchaseCreated(decoded)
             
         case EventTypes.widgetClose:
-            guard let payload = payload  else { throw Error.missingPayload }
+            guard let payload = payload  else { throw Error.missingPayload(type) }
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
         case EventTypes.sendCrypto:
-            guard let payload = payload  else { throw Error.missingPayload }
+            guard let payload = payload  else { throw Error.missingPayload(type) }
             /// sendCrypto is loosely versioned, which means we accept no version or version 1 only
             if let version = version, version != Constants.sendCryptoVersion {
                 throw Error.unhandledVersion(version, type)
@@ -48,7 +48,7 @@ extension IncomingEvent: DictionaryDecodable {
             self = .sendCrypto(decoded)
             
         case EventTypes.offrampPurchaseCreated:
-            guard let payload = payload  else { throw Error.missingPayload }
+            guard let payload = payload  else { throw Error.missingPayload(type) }
             let decoded: OfframpPurchaseCreatedPayload = try decoder.decode(payload)
             self = .offrampPurchaseCreated(decoded)
             
@@ -77,7 +77,7 @@ extension IncomingEvent {
     }
     
     enum Error: Swift.Error {
-        case missingType, missingPayload
+        case missingType, missingPayload(String), missingVersion(String)
         case unhandledType(String), unhandledVersion(Int, String)
     }
 }
