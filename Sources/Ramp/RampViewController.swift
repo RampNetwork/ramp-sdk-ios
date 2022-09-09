@@ -118,7 +118,7 @@ public final class RampViewController: UIViewController {
     }
     
     private func handleSendCryptoEvent(_ payload: SendCryptoPayload) {
-        delegate?.ramp(self, didRequestOfframp: payload) { resultPayload in
+        delegate?.ramp(self, didRequestSendCrypto: payload) { resultPayload in
             let event: OutgoingEvent = .sendCryptoResult(resultPayload)
             self.sendOutgoingEvent(event)
         }
