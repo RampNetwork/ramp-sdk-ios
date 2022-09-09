@@ -108,7 +108,7 @@ public final class RampViewController: UIViewController {
         case .onrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOnrampPurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
         case .sendCrypto(let payload): handleSendCryptoEvent(payload)
-        case .offrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOfframpPurchase: payload.offrampPurchase, payload.purchaseViewToken, payload.apiUrl)
+        case .offrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOfframpPurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         }
     }
     

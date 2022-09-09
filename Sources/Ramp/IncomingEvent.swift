@@ -111,6 +111,6 @@ public struct SendCryptoPayload: Decodable {
 
 struct OfframpPurchaseCreatedPayload: Decodable {
     let apiUrl: URL
+    let purchase: OfframpPurchase
     let purchaseViewToken: String
-    let offrampPurchase: OfframpPurchase
 }
