@@ -1,6 +1,6 @@
 import Foundation
 
-public struct OfframpPurchase: Codable {
+public struct OfframpSale: Codable {
     public let createdAt: String
     public let crypto: Crypto
     public let fiat: Fiat
