@@ -95,8 +95,8 @@ struct KycInitPayload: Decodable {
 
 struct OnrampPurchaseCreatedPayload: Decodable {
     let apiUrl: URL
-    let purchaseViewToken: String
     let purchase: OnrampPurchase
+    let purchaseViewToken: String
 }
 
 struct WidgetClosePayload: Decodable {
