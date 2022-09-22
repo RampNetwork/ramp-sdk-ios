@@ -6,7 +6,7 @@ enum IncomingEvent {
     case onrampPurchaseCreated(OnrampPurchaseCreatedPayload)
     case widgetClose(WidgetClosePayload)
     case sendCrypto(SendCryptoPayload)
-    case offrampPurchaseCreated(OfframpPurchaseCreatedPayload)
+    case offrampSaleCreated(OfframpSaleCreatedPayload)
 }
 
 extension IncomingEvent: DictionaryDecodable {
@@ -47,10 +47,10 @@ extension IncomingEvent: DictionaryDecodable {
             let decoded: SendCryptoPayload = try decoder.decode(payload)
             self = .sendCrypto(decoded)
             
-        case EventTypes.offrampPurchaseCreated:
+        case EventTypes.offrampSaleCreated:
             guard let payload = payload  else { throw Error.missingPayload(type) }
-            let decoded: OfframpPurchaseCreatedPayload = try decoder.decode(payload)
-            self = .offrampPurchaseCreated(decoded)
+            let decoded: OfframpSaleCreatedPayload = try decoder.decode(payload)
+            self = .offrampSaleCreated(decoded)
             
         default:
             throw Error.unhandledType(type)
@@ -67,7 +67,7 @@ extension IncomingEvent {
         static let onrampPurchaseCreated = "PURCHASE_CREATED"
         static let widgetClose = "WIDGET_CLOSE"
         static let sendCrypto = "SEND_CRYPTO"
-        static let offrampPurchaseCreated = "OFFRAMP_PURCHASE_CREATED"
+        static let offrampSaleCreated = "OFFRAMP_SALE_CREATED"
     }
     
     struct CodingKeys {
@@ -109,8 +109,8 @@ public struct SendCryptoPayload: Decodable {
     public let address: String
 }
 
-struct OfframpPurchaseCreatedPayload: Decodable {
+struct OfframpSaleCreatedPayload: Decodable {
     let apiUrl: URL
-    let purchase: OfframpPurchase
-    let purchaseViewToken: String
+    let sale: OfframpSale
+    let saleViewToken: String
 }
