@@ -104,7 +104,7 @@ struct WidgetClosePayload: Decodable {
 }
 
 public struct SendCryptoPayload: Decodable {
-    public let assetSymbol: String
+    public let assetInfo: OfframpAssetInfo
     public let amount: String
     public let address: String
 }
