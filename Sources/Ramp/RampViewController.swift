@@ -96,7 +96,7 @@ public final class RampViewController: UIViewController {
     
     private func sendOutgoingEvent(_ event: OutgoingEvent) {
         let message = try? event.messagePayload()
-        guard let message = message else { return }
+        guard let message else { return }
         let script = Constants.postMessageScript(message)
         webView.evaluateJavaScript(script) { _, _ in }
     }
@@ -145,35 +145,35 @@ public final class RampViewController: UIViewController {
     // MARK: Passbase outgoing events
     
     private func handlePassbaseStarted() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycStartedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycStarted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSubmitted(identityAccessKey: String) {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycSubmittedPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSubmitted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSuccess(identityAccessKey: String) {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycSuccessPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSuccess(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseAborted() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycAbortedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycAborted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseError() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycErrorPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycError(payload)
         sendOutgoingEvent(event)
@@ -209,7 +209,7 @@ extension RampViewController {
 extension RampViewController: ScriptMessageDelegate {
     func handler(_ scriptMessageHandler: ScriptMessageHandler, didReceiveMessage body: [String : Any]) {
         let event = try? IncomingEvent(dictionary: body)
-        guard let event = event else { return }
+        guard let event else { return }
         handleIncomingEvent(event)
     }
 }
@@ -232,7 +232,7 @@ extension RampViewController: PassbaseDelegate {
     
     public func onError(errorCode: String) {
         let error = PassbaseError(rawValue: errorCode)
-        guard let error = error else { return }
+        guard let error else { return }
         switch error {
         case .cancelledByUser: handlePassbaseAborted()
         case .biometricAuthenticationFailed: handlePassbaseError()

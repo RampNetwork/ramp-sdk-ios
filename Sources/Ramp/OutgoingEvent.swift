@@ -56,15 +56,15 @@ extension OutgoingEvent: MessageEventEncodable {
         }
         
         let payload: Any?
-        if let payloadData = payloadData {
+        if let payloadData {
             payload = try JSONSerialization.jsonObject(with: payloadData)
         } else { payload = nil }
         
         var dictionary: [String: Any] = [CodingKeys.type: type]
-        if let payload = payload {
+        if let payload {
             dictionary[CodingKeys.payload] = payload
         }
-        if let version = version {
+        if let version {
             dictionary[CodingKeys.version] = version
         }
             

@@ -11,7 +11,7 @@ class ScriptMessageHandler: NSObject {
 extension ScriptMessageHandler: WKScriptMessageHandler {
     func userContentController(_ userContentController: WKUserContentController, didReceive message: WKScriptMessage) {
         let body = message.body as? [String: Any]
-        guard let body = body else { return }
+        guard let body else { return }
         delegate?.handler(self, didReceiveMessage: body)
     }
 }

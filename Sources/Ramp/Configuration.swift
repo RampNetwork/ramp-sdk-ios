@@ -41,7 +41,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
         urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow)
         
-        if let enabledFlows = enabledFlows {
+        if let enabledFlows {
             let value = enabledFlows.map(\.rawValue).joined(separator: ",")
             urlComponents.appendQueryItem(name: "enabledFlows", value: value)
         }

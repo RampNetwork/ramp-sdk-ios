@@ -16,7 +16,7 @@ extension IncomingEvent: DictionaryDecodable {
         let payload = dictionary[CodingKeys.payload] as? [String: Any]
         let version = dictionary[CodingKeys.version] as? Int
         
-        guard let type = type else { throw Error.missingType }
+        guard let type else { throw Error.missingType }
         
         switch type {
             
@@ -24,31 +24,33 @@ extension IncomingEvent: DictionaryDecodable {
             self = .widgetConfigDone
             
         case EventTypes.kycInit:
-            guard let payload = payload else { throw Error.missingPayload(type) }
+            guard let payload else { throw Error.missingPayload(type) }
             let decoded: KycInitPayload = try decoder.decode(payload)
             self = .kycInit(decoded)
             
         case EventTypes.onrampPurchaseCreated:
-            guard let payload = payload  else { throw Error.missingPayload(type) }
+            guard let payload else { throw Error.missingPayload(type) }
             let decoded: OnrampPurchaseCreatedPayload = try decoder.decode(payload)
             self = .onrampPurchaseCreated(decoded)
             
         case EventTypes.widgetClose:
-            guard let payload = payload  else { throw Error.missingPayload(type) }
+            guard let payload else { throw Error.missingPayload(type) }
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
         case EventTypes.sendCrypto:
-            guard let payload = payload  else { throw Error.missingPayload(type) }
+            guard let payload else { throw Error.missingPayload(type) }
             /// sendCrypto is loosely versioned, which means we accept no version or version 1 only
-            if let version = version, version != Constants.sendCryptoVersion {
-                throw Error.unhandledVersion(version, type)
+            if let version {
+                guard version == Constants.sendCryptoVersion else {
+                    throw Error.unhandledVersion(version, type)
+                }
             }
             let decoded: SendCryptoPayload = try decoder.decode(payload)
             self = .sendCrypto(decoded)
             
         case EventTypes.offrampSaleCreated:
-            guard let payload = payload  else { throw Error.missingPayload(type) }
+            guard let payload else { throw Error.missingPayload(type) }
             let decoded: OfframpSaleCreatedPayload = try decoder.decode(payload)
             self = .offrampSaleCreated(decoded)
             
