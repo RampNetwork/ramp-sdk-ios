@@ -3,15 +3,6 @@ import XCTest
 
 class IncomingEventTests: XCTestCase {
     
-    func testCorrectWidgetConfigDone() throws {
-        let payload = ["type": "WIDGET_CONFIG_DONE"]
-        let event = try IncomingEvent(dictionary: payload)
-        guard case .widgetConfigDone = event else {
-            XCTFail("Failed to decode WIDGET_CONFIG_DONE event")
-            return
-        }
-    }
-    
     func testCorrectWidgetClose() throws {
         let showAlert = Bool.random()
         let payload: [String: Any] = ["type": "WIDGET_CLOSE",
