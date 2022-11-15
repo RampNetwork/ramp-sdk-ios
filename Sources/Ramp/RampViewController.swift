@@ -4,7 +4,7 @@ import Passbase
 
 public final class RampViewController: UIViewController {
     private let url: URL
-
+    
     private weak var webView: WKWebView!
     private weak var stackView: UIStackView!
     private var contentController: WKUserContentController { webView.configuration.userContentController }
@@ -38,7 +38,7 @@ public final class RampViewController: UIViewController {
     public override func viewDidLoad() {
         super.viewDidLoad()
         subscribeMessageHandler()
-         setupSwipeBackGesture()
+        setupSwipeBackGesture()
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -64,13 +64,13 @@ public final class RampViewController: UIViewController {
     }
     
     private func showCloseAlert() {
-        let alert = UIAlertController(title: Constants.closeAlertTitle,
-                                      message: Constants.closeAlertMessage, preferredStyle: .alert)
-        alert.view.tintColor = Constants.rampColor
-        let yesAction = UIAlertAction(title: Constants.closeAlertYesAction, style: .destructive) { [unowned self]  _ in
-            self.closeRamp()
-        }
-        let noAction = UIAlertAction(title: Constants.closeAlertNoAction, style: .cancel)
+        let alert = UIAlertController(title: Localizable.closeAlertTitle,
+                                      message: Localizable.closeAlertMessage,
+                                      preferredStyle: .alert)
+        alert.view.tintColor = .rampColor
+        let yesAction = UIAlertAction(title: Localizable.yes,
+                                      style: .destructive) { [unowned self] _ in self.closeRamp() }
+        let noAction = UIAlertAction(title: Localizable.no, style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
         present(alert, animated: true)
@@ -83,7 +83,7 @@ public final class RampViewController: UIViewController {
     }
     
     // MARK: Message handling
-        
+    
     private func subscribeMessageHandler() {
         let handler = ScriptMessageHandler()
         handler.delegate = self
@@ -95,7 +95,8 @@ public final class RampViewController: UIViewController {
     }
     
     private func sendOutgoingEvent(_ event: OutgoingEvent) {
-        guard let message = try? event.messagePayload() else { return }
+        let message = try? event.messagePayload()
+        guard let message else { return }
         let script = Constants.postMessageScript(message)
         webView.evaluateJavaScript(script) { _, _ in }
     }
@@ -103,17 +104,23 @@ public final class RampViewController: UIViewController {
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
         case .kycInit(let payload): startPassbaseFlow(payload)
-        case .purchaseCreated(let payload):
-            delegate?.ramp(self, didCreatePurchase: payload.purchase,
-                           purchaseViewToken: payload.purchaseViewToken, apiUrl: payload.apiUrl)
-        case .purchaseFailed: delegate?.rampPurchaseDidFail(self)
+        case .onrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOnrampPurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
+        case .sendCrypto(let payload): handleSendCryptoEvent(payload)
+        case .offrampSaleCreated(let payload): delegate?.ramp(self, didCreateOfframpSale: payload.sale, payload.saleViewToken, payload.apiUrl)
         }
     }
     
     private func handleCloseRampEvent(_ payload: WidgetClosePayload) {
         if payload.showAlert { showCloseAlert() }
         else { closeRamp() }
+    }
+    
+    private func handleSendCryptoEvent(_ payload: SendCryptoPayload) {
+        delegate?.ramp(self, didRequestSendCrypto: payload) { resultPayload in
+            let event: OutgoingEvent = .sendCryptoResult(resultPayload)
+            self.sendOutgoingEvent(event)
+        }
     }
     
     // MARK: Passbase actions
@@ -137,35 +144,35 @@ public final class RampViewController: UIViewController {
     // MARK: Passbase outgoing events
     
     private func handlePassbaseStarted() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycStartedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycStarted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSubmitted(identityAccessKey: String) {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycSubmittedPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSubmitted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseSuccess(identityAccessKey: String) {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycSuccessPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
         let event: OutgoingEvent = .kycSuccess(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseAborted() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycAbortedPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycAborted(payload)
         sendOutgoingEvent(event)
     }
     
     private func handlePassbaseError() {
-        guard let verificationId = verificationId else { return }
+        guard let verificationId else { return }
         let payload = KycErrorPayload(verificationId: verificationId)
         let event: OutgoingEvent = .kycError(payload)
         sendOutgoingEvent(event)
@@ -173,9 +180,15 @@ public final class RampViewController: UIViewController {
 }
 
 extension RampViewController: WKUIDelegate {
-    public func webView(_ webView: WKWebView, createWebViewWith configuration: WKWebViewConfiguration, for navigationAction: WKNavigationAction, windowFeatures: WKWindowFeatures) -> WKWebView? {
+    public func webView(_ webView: WKWebView,
+                        createWebViewWith configuration: WKWebViewConfiguration,
+                        for navigationAction: WKNavigationAction,
+                        windowFeatures: WKWindowFeatures) -> WKWebView? {
         let app = UIApplication.shared
-        if let navigationUrl = navigationAction.request.url, app.canOpenURL(navigationUrl) { app.open(navigationUrl) }
+        if let navigationUrl = navigationAction.request.url,
+           app.canOpenURL(navigationUrl) {
+            app.open(navigationUrl)
+        }
         return nil
     }
 }
@@ -194,7 +207,8 @@ extension RampViewController {
 
 extension RampViewController: ScriptMessageDelegate {
     func handler(_ scriptMessageHandler: ScriptMessageHandler, didReceiveMessage body: [String : Any]) {
-        guard let event = try? IncomingEvent(dictionary: body) else { return }
+        let event = try? IncomingEvent(dictionary: body)
+        guard let event else { return }
         handleIncomingEvent(event)
     }
 }
@@ -216,10 +230,15 @@ extension RampViewController: PassbaseDelegate {
     }
     
     public func onError(errorCode: String) {
-        guard let error = PassbaseError(rawValue: errorCode) else { return }
+        let error = PassbaseError(rawValue: errorCode)
+        guard let error else { return }
         switch error {
         case .cancelledByUser: handlePassbaseAborted()
         case .biometricAuthenticationFailed: handlePassbaseError()
         }
     }
+}
+
+private extension UIColor {
+    static var rampColor: UIColor { UIColor(red: 19/255.0, green: 159/255.0, blue: 106/255.0, alpha: 1) }
 }

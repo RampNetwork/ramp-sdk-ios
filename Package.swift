@@ -5,18 +5,18 @@ import PackageDescription
 
 let package = Package(
     name: "Ramp",
-    platforms: [
-        .iOS(.v11)
-    ],
+    defaultLocalization: "en",
+    platforms: [.iOS(.v11)],
     products: [
         .library(name: "Ramp", targets: ["Ramp"])
     ],
     dependencies: [
         .package(name: "Passbase",
                  url: "https://github.com/passbase/passbase-sp.git",
-                 .upToNextMajor(from: "2.8.0")),
+                 from: "2.8.0"),
     ],
     targets: [
-        .target(name: "Ramp", dependencies: ["Passbase"])
+        .target(name: "Ramp", dependencies: ["Passbase"]),
+        .testTarget(name: "RampTests", dependencies: ["Ramp"])
     ]
 )

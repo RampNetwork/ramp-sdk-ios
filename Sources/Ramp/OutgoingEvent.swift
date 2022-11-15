@@ -7,52 +7,101 @@ enum OutgoingEvent {
     case kycAborted(KycAbortedPayload)
     case kycError(KycErrorPayload)
     case backButtonPressed
+    case sendCryptoResult(SendCryptoResultPayload)
 }
 
 extension OutgoingEvent: MessageEventEncodable {
-    enum Error: Swift.Error { case stringEncodingFailed }
     
     func messagePayload() throws -> String {
         let type: String
         let payloadData: Data?
-        switch self {
+        let version: Int?
         
-        case .kycStarted(let payload):
-            type = "KYC_STARTED"
-            payloadData = try encoder.encode(payload)
-        case .kycSubmitted(let payload):
+        switch self {
             
-            type = "KYC_SUBMITTED"
+        case .kycStarted(let payload):
+            type = EventType.kycStarted
+            version = nil
+            payloadData = try encoder.encode(payload)
+            
+        case .kycSubmitted(let payload):
+            type = EventType.kycSubmitted
+            version = nil
             payloadData = try encoder.encode(payload)
             
         case .kycSuccess(let payload):
-            type = "KYC_SUCCESS"
+            type = EventType.kycSuccess
+            version = nil
             payloadData = try encoder.encode(payload)
             
         case .kycAborted(let payload):
-            type = "KYC_ABORTED"
+            type = EventType.kycAborted
+            version = nil
             payloadData = try encoder.encode(payload)
             
         case .kycError(let payload):
-            type = "KYC_ERROR"
+            type = EventType.kycError
+            version = nil
             payloadData = try encoder.encode(payload)
             
         case .backButtonPressed:
-            type = "BACK_BUTTON_PRESSED"
+            type = EventType.backButtonPressed
+            version = nil
             payloadData = nil
+            
+        case .sendCryptoResult(let payload):
+            type = EventType.sendCryptoResult
+            version = Constants.sendCryptoVersion
+            payloadData = try encoder.encode(payload)
         }
         
         let payload: Any?
-        if let payloadData = payloadData { payload = try JSONSerialization.jsonObject(with: payloadData) }
-        else { payload = nil }
-        let dictionary = ["type": type, "payload": payload]
-        let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: [.sortedKeys])
-        if let jsonString = String(data: jsonData, encoding: .utf8) { return jsonString }
-        else { throw Error.stringEncodingFailed }
+        if let payloadData {
+            payload = try JSONSerialization.jsonObject(with: payloadData)
+        } else { payload = nil }
+        
+        var dictionary: [String: Any] = [CodingKeys.type: type]
+        if let payload {
+            dictionary[CodingKeys.payload] = payload
+        }
+        if let version {
+            dictionary[CodingKeys.version] = version
+        }
+            
+        let jsonData = try JSONSerialization
+            .data(withJSONObject: dictionary, options: .sortedKeys)
+        
+        if let jsonString = String(data: jsonData, encoding: .utf8) {
+            return jsonString
+        } else {
+            throw Error.stringEncodingFailed
+        }
     }
 }
 
-// MARK: Payloads
+// MARK: - Types
+
+extension OutgoingEvent {
+    struct EventType {
+        static let kycStarted = "KYC_STARTED"
+        static let kycSubmitted = "KYC_SUBMITTED"
+        static let kycSuccess = "KYC_SUCCESS"
+        static let kycAborted = "KYC_ABORTED"
+        static let kycError = "KYC_ERROR"
+        static let backButtonPressed = "BACK_BUTTON_PRESSED"
+        static let sendCryptoResult = "SEND_CRYPTO_RESULT"
+    }
+    
+    struct CodingKeys {
+        static let payload = "payload"
+        static let type = "type"
+        static let version = "eventVersion"
+    }
+    
+    enum Error: Swift.Error { case stringEncodingFailed }
+}
+
+// MARK: - Payloads
 
 struct KycStartedPayload: Encodable {
     let verificationId: Int
@@ -74,4 +123,12 @@ struct KycAbortedPayload: Encodable {
 
 struct KycErrorPayload: Encodable {
     let verificationId: Int
+}
+
+public struct SendCryptoResultPayload: Encodable {
+    let txHash: String?
+    
+    public init(txHash: String? = nil) {
+        self.txHash = txHash
+    }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-public struct RampPurchase: Decodable {
+public struct OnrampPurchase: Codable {
     public let id: String
     public let endTime: String
     public let asset: AssetInfo
@@ -20,7 +20,7 @@ public struct RampPurchase: Decodable {
     public let escrowAddress: String?
     public let escrowDetailsHash: String?
     
-    public struct AssetInfo: Decodable {
+    public struct AssetInfo: Codable {
         public let address: String?
         public let decimals: Int
         public let name: String
