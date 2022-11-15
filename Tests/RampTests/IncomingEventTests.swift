@@ -16,17 +16,32 @@ class IncomingEventTests: XCTestCase {
     }
     
     func testCorrectSendCrypto() throws {
-        let assetSymbol = String.random()
+        let chain = String.random()
+        let decimals = Int.random(in: 666...777)
+        let name = String.random()
+        let symbol = String.random()
+        let type = String.random()
         let amount = String.random()
         let address = String.random()
         let payload: [String: Any] = ["type": "SEND_CRYPTO",
                                       "eventVersion": 1,
-                                      "payload": ["assetSymbol": assetSymbol,
-                                                  "amount": amount,
-                                                  "address": address]]
+                                      "payload": [
+                                        "assetInfo": [
+                                            "chain": chain,
+                                            "decimals": decimals,
+                                            "name": name,
+                                            "symbol": symbol,
+                                            "type": type
+                                        ],
+                                        "amount": amount,
+                                        "address": address]]
         let event = try IncomingEvent(dictionary: payload)
         if case .sendCrypto(let payload) = event {
-            XCTAssertEqual(payload.assetSymbol, assetSymbol)
+            XCTAssertEqual(payload.assetInfo.chain, chain)
+            XCTAssertEqual(payload.assetInfo.decimals, decimals)
+            XCTAssertEqual(payload.assetInfo.name, name)
+            XCTAssertEqual(payload.assetInfo.symbol, symbol)
+            XCTAssertEqual(payload.assetInfo.type, type)
             XCTAssertEqual(payload.amount, amount)
             XCTAssertEqual(payload.address, address)
         } else { XCTFail("Failed to decode SEND_CRYPTO event") }
