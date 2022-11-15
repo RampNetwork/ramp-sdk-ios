@@ -59,7 +59,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "userAddress", value: userAddress)
         urlComponents.appendQueryItem(name: "userEmailAddress", value: userEmailAddress)
         
-        if case .some(let useCallback) = useSendCryptoCallback, useCallback {
+        if useSendCryptoCallback == true {
             urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion",
                                           value: Constants.sendCryptoVersion)
         }
