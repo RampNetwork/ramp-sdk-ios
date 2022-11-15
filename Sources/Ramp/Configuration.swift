@@ -18,6 +18,7 @@ public struct Configuration: Decodable {
     public var hostApiKey: String?
     public var hostAppName: String?
     public var hostLogoUrl: String?
+    public var offrampAsset: String?
     public var offrampWebhookV3Url: String?
     public var selectedCountryCode: String?
     public var swapAmount: String?
@@ -52,6 +53,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "hostApiKey", value: hostApiKey)
         urlComponents.appendQueryItem(name: "hostAppName", value: hostAppName)
         urlComponents.appendQueryItem(name: "hostLogoUrl", value: hostLogoUrl)
+        urlComponents.appendQueryItem(name: "offrampAsset", value: offrampAsset)
         urlComponents.appendQueryItem(name: "offrampWebhookV3Url", value: offrampWebhookV3Url)
         urlComponents.appendQueryItem(name: "selectedCountryCode", value: selectedCountryCode)
         urlComponents.appendQueryItem(name: "swapAmount", value: swapAmount)
