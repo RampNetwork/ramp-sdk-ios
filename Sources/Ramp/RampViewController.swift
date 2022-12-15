@@ -38,6 +38,7 @@ public final class RampViewController: UIViewController {
         super.viewDidLoad()
         subscribeMessageHandler()
         setupSwipeBackGesture()
+        Logger.debug("Loading URL: \(url.absoluteString)")
         let request = URLRequest(url: url)
         webView.load(request)
     }
@@ -94,22 +95,31 @@ public final class RampViewController: UIViewController {
     }
     
     private func sendOutgoingEvent(_ event: OutgoingEvent) {
-        let message = try? event.messagePayload()
-        guard let message else { return }
+        let message: String
+        do {
+            message = try event.messagePayload()
+        } catch {
+            Logger.debug(error.localizedDescription)
+            return
+        }
         let script = Constants.postMessageScript(message)
         webView.evaluateJavaScript(script) { _, _ in }
     }
     
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
-        case .onrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOnrampPurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
-        case .widgetClose(let payload): handleCloseRampEvent(payload)
+        case .onrampPurchaseCreated(let payload): handleOnrampPurchaseCreatedEvent(payload)
+        case .widgetClose(let payload): handleWidgetCloseEvent(payload)
         case .sendCrypto(let payload): handleSendCryptoEvent(payload)
-        case .offrampSaleCreated(let payload): delegate?.ramp(self, didCreateOfframpSale: payload.sale, payload.saleViewToken, payload.apiUrl)
+        case .offrampSaleCreated(let payload): handleOfframpSaleCreatedEvent(payload)
         }
     }
     
-    private func handleCloseRampEvent(_ payload: WidgetClosePayload) {
+    private func handleOnrampPurchaseCreatedEvent(_ payload: OnrampPurchaseCreatedPayload) {
+        delegate?.ramp(self, didCreateOnrampPurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
+    }
+    
+    private func handleWidgetCloseEvent(_ payload: WidgetClosePayload) {
         if payload.showAlert { showCloseAlert() }
         else { closeRamp() }
     }
@@ -119,6 +129,10 @@ public final class RampViewController: UIViewController {
             let event: OutgoingEvent = .sendCryptoResult(resultPayload)
             self.sendOutgoingEvent(event)
         }
+    }
+    
+    private func handleOfframpSaleCreatedEvent(_ payload: OfframpSaleCreatedPayload) {
+        delegate?.ramp(self, didCreateOfframpSale: payload.sale, payload.saleViewToken, payload.apiUrl)
     }
 }
 
@@ -138,8 +152,13 @@ extension RampViewController: WKUIDelegate {
 
 extension RampViewController: ScriptMessageDelegate {
     func handler(_ scriptMessageHandler: ScriptMessageHandler, didReceiveMessage body: [String : Any]) {
-        let event = try? IncomingEvent(dictionary: body)
-        guard let event else { return }
+        let event: IncomingEvent
+        do {
+            event = try IncomingEvent(dictionary: body)
+        } catch {
+            Logger.debug(error.localizedDescription)
+            return
+        }
         handleIncomingEvent(event)
     }
 }
