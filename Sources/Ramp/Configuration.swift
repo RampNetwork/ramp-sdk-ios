@@ -21,6 +21,8 @@ public struct Configuration: Decodable {
     public var offrampAsset: String?
     public var offrampWebhookV3Url: String?
     public var selectedCountryCode: String?
+    public var sdkType: String { Constants.sdkType }
+    public var sdkVersion: String { Constants.sdkVersion }
     public var swapAmount: String?
     public var swapAsset: String?
     public var userAddress: String?
@@ -56,6 +58,8 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "offrampAsset", value: offrampAsset)
         urlComponents.appendQueryItem(name: "offrampWebhookV3Url", value: offrampWebhookV3Url)
         urlComponents.appendQueryItem(name: "selectedCountryCode", value: selectedCountryCode)
+        urlComponents.appendQueryItem(name: "sdkType", value: sdkType)
+        urlComponents.appendQueryItem(name: "sdkVersion", value: sdkVersion)
         urlComponents.appendQueryItem(name: "swapAmount", value: swapAmount)
         urlComponents.appendQueryItem(name: "swapAsset", value: swapAsset)
         urlComponents.appendQueryItem(name: "userAddress", value: userAddress)
