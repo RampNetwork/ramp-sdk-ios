@@ -1,5 +1,9 @@
 import Foundation
 
+// use
+// genstrings -o Sources/Ramp/Resources/en.lproj Sources/Ramp/*.swift
+// to regenerate Localizable.strings
+
 struct Localizable {
     static var closeAlertTitle: String {
         NSLocalizedString("Do you really want to close Ramp?",
