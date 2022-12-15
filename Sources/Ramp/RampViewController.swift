@@ -1,6 +1,5 @@
 import UIKit
 import WebKit
-import Passbase
 
 public final class RampViewController: UIViewController {
     private let url: URL
@@ -103,7 +102,6 @@ public final class RampViewController: UIViewController {
     
     private func handleIncomingEvent(_ event: IncomingEvent) {
         switch event {
-        case .kycInit(let payload): startPassbaseFlow(payload)
         case .onrampPurchaseCreated(let payload): delegate?.ramp(self, didCreateOnrampPurchase: payload.purchase, payload.purchaseViewToken, payload.apiUrl)
         case .widgetClose(let payload): handleCloseRampEvent(payload)
         case .sendCrypto(let payload): handleSendCryptoEvent(payload)
@@ -122,61 +120,6 @@ public final class RampViewController: UIViewController {
             self.sendOutgoingEvent(event)
         }
     }
-    
-    // MARK: Passbase actions
-    
-    private var verificationId: Int?
-    
-    private func startPassbaseFlow(_ payload: KycInitPayload) {
-        verificationId = payload.verificationId
-        
-        PassbaseSDK.initialize(publishableApiKey: payload.apiKey)
-        PassbaseSDK.prefillUserEmail = payload.email
-        PassbaseSDK.prefillCountry = payload.countryCode
-        PassbaseSDK.metaData = payload.metaData
-        PassbaseSDK.delegate = self
-        
-        DispatchQueue.main.async {
-            try? PassbaseSDK.startVerification(from: self)
-        }
-    }
-    
-    // MARK: Passbase outgoing events
-    
-    private func handlePassbaseStarted() {
-        guard let verificationId else { return }
-        let payload = KycStartedPayload(verificationId: verificationId)
-        let event: OutgoingEvent = .kycStarted(payload)
-        sendOutgoingEvent(event)
-    }
-    
-    private func handlePassbaseSubmitted(identityAccessKey: String) {
-        guard let verificationId else { return }
-        let payload = KycSubmittedPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
-        let event: OutgoingEvent = .kycSubmitted(payload)
-        sendOutgoingEvent(event)
-    }
-    
-    private func handlePassbaseSuccess(identityAccessKey: String) {
-        guard let verificationId else { return }
-        let payload = KycSuccessPayload(verificationId: verificationId, identityAccessKey: identityAccessKey)
-        let event: OutgoingEvent = .kycSuccess(payload)
-        sendOutgoingEvent(event)
-    }
-    
-    private func handlePassbaseAborted() {
-        guard let verificationId else { return }
-        let payload = KycAbortedPayload(verificationId: verificationId)
-        let event: OutgoingEvent = .kycAborted(payload)
-        sendOutgoingEvent(event)
-    }
-    
-    private func handlePassbaseError() {
-        guard let verificationId else { return }
-        let payload = KycErrorPayload(verificationId: verificationId)
-        let event: OutgoingEvent = .kycError(payload)
-        sendOutgoingEvent(event)
-    }
 }
 
 extension RampViewController: WKUIDelegate {
@@ -193,49 +136,11 @@ extension RampViewController: WKUIDelegate {
     }
 }
 
-extension RampViewController {
-    public enum Error: Swift.Error {
-        case closeRampFailed
-        case serializeOutgoingEventFailed
-        case missingKycVerificationId
-        case unableToOpenUrl
-        case deserializeIncomingEventFailed
-        case messaveEventReceiveFailed
-        case unknownPassbaseError
-    }
-}
-
 extension RampViewController: ScriptMessageDelegate {
     func handler(_ scriptMessageHandler: ScriptMessageHandler, didReceiveMessage body: [String : Any]) {
         let event = try? IncomingEvent(dictionary: body)
         guard let event else { return }
         handleIncomingEvent(event)
-    }
-}
-
-// MARK: - Passbase delegate
-
-/// Documentation: https://docs.passbase.com/ios#4-handling-verifications
-extension RampViewController: PassbaseDelegate {
-    public func onStart() {
-        handlePassbaseStarted()
-    }
-    
-    public func onSubmitted(identityAccessKey: String) {
-        handlePassbaseSubmitted(identityAccessKey: identityAccessKey)
-    }
-    
-    public func onFinish(identityAccessKey: String) {
-        handlePassbaseSuccess(identityAccessKey: identityAccessKey)
-    }
-    
-    public func onError(errorCode: String) {
-        let error = PassbaseError(rawValue: errorCode)
-        guard let error else { return }
-        switch error {
-        case .cancelledByUser: handlePassbaseAborted()
-        case .biometricAuthenticationFailed: handlePassbaseError()
-        }
     }
 }
 

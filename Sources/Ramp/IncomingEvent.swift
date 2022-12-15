@@ -1,7 +1,6 @@
 import Foundation
 
 enum IncomingEvent {
-    case kycInit(KycInitPayload)
     case onrampPurchaseCreated(OnrampPurchaseCreatedPayload)
     case widgetClose(WidgetClosePayload)
     case sendCrypto(SendCryptoPayload)
@@ -18,11 +17,6 @@ extension IncomingEvent: DictionaryDecodable {
         guard let type else { throw Error.missingType }
         
         switch type {
-            
-        case EventTypes.kycInit:
-            guard let payload else { throw Error.missingPayload(type) }
-            let decoded: KycInitPayload = try decoder.decode(payload)
-            self = .kycInit(decoded)
             
         case EventTypes.onrampPurchaseCreated:
             guard let payload else { throw Error.missingPayload(type) }
@@ -60,7 +54,6 @@ extension IncomingEvent: DictionaryDecodable {
 
 extension IncomingEvent {
     struct EventTypes {
-        static let kycInit = "KYC_INIT"
         static let onrampPurchaseCreated = "PURCHASE_CREATED"
         static let widgetClose = "WIDGET_CLOSE"
         static let sendCrypto = "SEND_CRYPTO"
@@ -80,15 +73,6 @@ extension IncomingEvent {
 }
 
 // MARK: - Payloads
-
-struct KycInitPayload: Decodable {
-    let email: String
-    let countryCode: String
-    let verificationId: Int
-    let provider: String
-    let apiKey: String
-    let metaData: String?
-}
 
 struct OnrampPurchaseCreatedPayload: Decodable {
     let apiUrl: URL

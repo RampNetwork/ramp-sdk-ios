@@ -10,13 +10,8 @@ let package = Package(
     products: [
         .library(name: "Ramp", targets: ["Ramp"])
     ],
-    dependencies: [
-        .package(name: "Passbase",
-                 url: "https://github.com/passbase/passbase-sp.git",
-                 from: "2.8.0"),
-    ],
     targets: [
-        .target(name: "Ramp", dependencies: ["Passbase"]),
+        .target(name: "Ramp"),
         .testTarget(name: "RampTests", dependencies: ["Ramp"])
     ]
 )

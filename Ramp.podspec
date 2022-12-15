@@ -9,5 +9,4 @@ Pod::Spec.new do |spec|
     spec.ios.deployment_target  = '11.0'
     spec.source_files = 'Sources/Ramp/*.swift'
     spec.resource_bundles = { 'Ramp' => 'Sources/Ramp/Resources/*' }
-    spec.dependency 'Passbase', '~> 2.8'
 end
