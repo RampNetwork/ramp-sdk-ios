@@ -99,7 +99,7 @@ public final class RampViewController: UIViewController {
         do {
             message = try event.messagePayload()
         } catch {
-            Logger.debug(error.localizedDescription)
+            Logger.error(error)
             return
         }
         let script = Constants.postMessageScript(message)
@@ -156,7 +156,7 @@ extension RampViewController: ScriptMessageDelegate {
         do {
             event = try IncomingEvent(dictionary: body)
         } catch {
-            Logger.debug(error.localizedDescription)
+            Logger.error(error)
             return
         }
         handleIncomingEvent(event)

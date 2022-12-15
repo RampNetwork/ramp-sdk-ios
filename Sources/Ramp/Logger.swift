@@ -13,4 +13,10 @@ struct Logger {
         print("💜", message)
         #endif
     }
+    
+    static func error(_ error: Error) {
+        #if DEBUG
+        print("❤️", String(describing: error))
+        #endif
+    }
 }
