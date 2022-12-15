@@ -27,6 +27,7 @@ public final class RampViewController: UIViewController {
         self.stackView = stackView
         
         let configuration = WKWebViewConfiguration()
+        configuration.allowsInlineMediaPlayback = true
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.scrollView.showsVerticalScrollIndicator = false
         webView.uiDelegate = self
