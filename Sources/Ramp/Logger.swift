@@ -10,13 +10,13 @@ import Foundation
 struct Logger {
     static func debug(_ message: String) {
         #if DEBUG
-        print("💜", message)
+        print("[RampSdk]", message)
         #endif
     }
     
     static func error(_ error: Error) {
         #if DEBUG
-        print("❤️", String(describing: error))
+        print("[RampSdk]", String(describing: error))
         #endif
     }
 }
