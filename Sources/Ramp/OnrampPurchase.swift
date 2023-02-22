@@ -1,24 +1,24 @@
 import Foundation
 
 public struct OnrampPurchase: Codable {
-    public let id: String
-    public let endTime: String
+    public let appliedFee: Double
     public let asset: AssetInfo
-    public let receiverAddress: String
-    public let cryptoAmount: String
-    public let fiatCurrency: String
-    public let fiatValue: Double
     public let assetExchangeRate: Double
     public let baseRampFee: Double
-    public let networkFee: Double
-    public let appliedFee: Double
-    public let paymentMethodType: String
-    public let finalTxHash: String?
     public let createdAt: String
-    public let updatedAt: String
-    public let status: String
+    public let cryptoAmount: String
+    public let endTime: String?
     public let escrowAddress: String?
     public let escrowDetailsHash: String?
+    public let fiatCurrency: String
+    public let fiatValue: Double
+    public let finalTxHash: String?
+    public let id: String
+    public let networkFee: Double
+    public let paymentMethodType: String
+    public let receiverAddress: String
+    public let status: String
+    public let updatedAt: String
     
     public struct AssetInfo: Codable {
         public let address: String?
