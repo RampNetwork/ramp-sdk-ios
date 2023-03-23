@@ -84,7 +84,7 @@ struct WidgetClosePayload: Decodable {
     let showAlert: Bool
 }
 
-public struct SendCryptoPayload: Decodable {
+public struct SendCryptoPayload: Codable {
     public let assetInfo: OfframpAssetInfo
     public let amount: String
     public let address: String
