@@ -41,7 +41,9 @@ public final class RampViewController: UIViewController {
         setupSwipeBackGesture()
         Logger.debug("Loading URL: \(url.absoluteString)")
         let request = URLRequest(url: url)
-        webView.load(request)
+        DispatchQueue.main.async {
+            self.webView.load(request)
+        }
     }
     
     deinit {
