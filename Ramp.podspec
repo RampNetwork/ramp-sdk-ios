@@ -1,6 +1,6 @@
 Pod::Spec.new do |spec|
     spec.name = 'Ramp'
-    spec.version = '4.0.1'
+    spec.version = '4.0.2'
     spec.license = 'proprietary'
     spec.summary = 'Ramp SDK for iOS'
     spec.homepage = 'https://ramp.network/'
