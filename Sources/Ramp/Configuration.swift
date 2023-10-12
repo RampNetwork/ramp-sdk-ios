@@ -35,7 +35,7 @@ public struct Configuration: Decodable {
 }
 
 extension Configuration {
-    func buildUrl() throws -> URL {
+    public func buildUrl() throws -> URL {
         guard var urlComponents = URLComponents(string: url) else { throw Error.invalidUrl }
         urlComponents.path = "/"
         

@@ -30,6 +30,7 @@ public final class RampViewController: UIViewController {
         configuration.allowsInlineMediaPlayback = true
         let webView = WKWebView(frame: .zero, configuration: configuration)
         webView.scrollView.showsVerticalScrollIndicator = false
+        webView.navigationDelegate = self
         webView.uiDelegate = self
         stackView.addArrangedSubview(webView)
         self.webView = webView
@@ -137,11 +138,44 @@ public final class RampViewController: UIViewController {
     }
 }
 
+extension RampViewController: WKNavigationDelegate {
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationAction: WKNavigationAction, decisionHandler: @escaping (WKNavigationActionPolicy) -> Void) {
+        Logger.debug(#function, "navigationAction")
+        Logger.debug(navigationAction.request.url)
+//        if let url = navigationAction.request.url,
+//           url.absoluteString.contains("sumsub")
+//        {
+//            decisionHandler(.cancel)
+//            UIApplication.shared.open(url)
+//            return
+//        }
+        decisionHandler(.allow)
+    }
+    
+    public func webView(_ webView: WKWebView, decidePolicyFor navigationResponse: WKNavigationResponse, decisionHandler: @escaping (WKNavigationResponsePolicy) -> Void) {
+        Logger.debug(#function, "navigationResponse")
+        Logger.debug(navigationResponse.response.url)
+        decisionHandler(.allow)
+    }
+    
+    public func webView(_ webView: WKWebView, didStartProvisionalNavigation navigation: WKNavigation!) {
+        Logger.debug(#function)
+        Logger.debug(webView.url)
+    }
+    
+    public func webView(_ webView: WKWebView, didCommit navigation: WKNavigation!) {
+        Logger.debug(#function)
+        Logger.debug(webView.url)
+    }
+}
+
 extension RampViewController: WKUIDelegate {
     public func webView(_ webView: WKWebView,
                         createWebViewWith configuration: WKWebViewConfiguration,
                         for navigationAction: WKNavigationAction,
                         windowFeatures: WKWindowFeatures) -> WKWebView? {
+        Logger.debug(#function)
+        Logger.debug(navigationAction.request.mainDocumentURL?.absoluteString ?? "")
         let app = UIApplication.shared
         if let navigationUrl = navigationAction.request.url,
            app.canOpenURL(navigationUrl) {

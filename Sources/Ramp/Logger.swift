@@ -1,15 +1,15 @@
 import Foundation
 
 struct Logger {
-    static func debug(_ message: String) {
+    static func debug(_ message: Any...) {
         #if DEBUG
-        print("[debug]", message)
+        print("[MJ: debug]", message)
         #endif
     }
     
-    static func error(_ error: Error) {
+    static func error(_ error: Any...) {
         #if DEBUG
-        print("[error]", String(describing: error))
+        print("[MJ: error]", error)
         #endif
     }
 }
