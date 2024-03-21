@@ -1,7 +1,7 @@
 import Foundation
 
 /// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.ramp.network/configuration)
-public struct Configuration: Decodable {
+public struct Configuration: Codable, Equatable {
     
     /// main URL
     public var url: String = Constants.defaultUrl
@@ -79,7 +79,9 @@ extension Configuration {
 }
 
 public extension Configuration {
-    enum Flow: String, CaseIterable, Decodable {
+    enum Flow: String, CaseIterable, Codable, Hashable, Identifiable {
+        public var id: String { rawValue }
+        
         case onramp = "ONRAMP"
         case offramp = "OFFRAMP"
     }
