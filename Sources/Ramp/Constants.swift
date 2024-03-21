@@ -5,7 +5,7 @@ struct Constants {
     static let defaultUrl: String = "https://app.ramp.network"
     static let scriptMessageHandlerName: String = "RampInstantMobile"
     static let sendCryptoVersion: Int = 1
-    static let sdkType: String = "IOS"
+    static let sdkType: String = "iOS"
     static let sdkVersion: String = "4.0.2"
     
     static func postMessageScript(_ message: String) -> String {
