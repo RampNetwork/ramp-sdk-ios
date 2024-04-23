@@ -2,11 +2,6 @@ import Foundation
 
 /// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.ramp.network/configuration)
 public struct Configuration: Codable, Equatable {
-    
-    /// main URL
-    public var url: String = Constants.defaultUrl
-    
-    /// query params
     public var containerNode: String?
     public var deepLinkScheme: String?
     public var defaultAsset: String?
@@ -21,14 +16,15 @@ public struct Configuration: Codable, Equatable {
     public var offrampAsset: String?
     public var offrampWebhookV3Url: String?
     public var selectedCountryCode: String?
-    public var sdkType: String { Constants.sdkType }
-    public var sdkVersion: String { Constants.sdkVersion }
+    public var sdkType: String? = Constants.sdkType
+    public var sdkVersion: String? = Constants.sdkVersion
     public var swapAmount: String?
     public var swapAsset: String?
+    public var url: String = Constants.defaultUrl
     public var userAddress: String?
     public var userEmailAddress: String?
     public var useSendCryptoCallback: Bool?
-    public var variant: String { Constants.sdkVariant }
+    public var variant: String? = Constants.sdkVariant
     public var webhookStatusUrl: String?
     
     public init() {}
@@ -82,8 +78,8 @@ public extension Configuration {
     enum Flow: String, CaseIterable, Codable, Hashable, Identifiable {
         public var id: String { rawValue }
         
-        case onramp = "ONRAMP"
         case offramp = "OFFRAMP"
+        case onramp = "ONRAMP"
     }
     
     enum Error: Swift.Error { case invalidUrl, invalidParameters }
