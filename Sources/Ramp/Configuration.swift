@@ -15,6 +15,7 @@ public struct Configuration: Codable, Equatable {
     public var hostLogoUrl: String?
     public var offrampAsset: String?
     public var offrampWebhookV3Url: String?
+    public var paymentMethodType: String?
     public var selectedCountryCode: String?
     public var sdkType: String? = Constants.sdkType
     public var sdkVersion: String? = Constants.sdkVersion
@@ -53,6 +54,7 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "hostLogoUrl", value: hostLogoUrl)
         urlComponents.appendQueryItem(name: "offrampAsset", value: offrampAsset)
         urlComponents.appendQueryItem(name: "offrampWebhookV3Url", value: offrampWebhookV3Url)
+        urlComponents.appendQueryItem(name: "paymentMethodType", value: paymentMethodType)
         urlComponents.appendQueryItem(name: "selectedCountryCode", value: selectedCountryCode)
         urlComponents.appendQueryItem(name: "sdkType", value: sdkType)
         urlComponents.appendQueryItem(name: "sdkVersion", value: sdkVersion)
