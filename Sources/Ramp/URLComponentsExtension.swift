@@ -17,4 +17,9 @@ extension URLComponents {
         if queryItems == nil { queryItems = [queryItem] }
         else { queryItems!.append(queryItem) }
     }
+    
+    mutating func appendQueryItem(name: String, value: Bool?) {
+        guard let value else { return }
+        appendQueryItem(name: name, value: value ? "true" : "false")
+    }
 }

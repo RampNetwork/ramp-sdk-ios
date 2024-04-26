@@ -25,6 +25,7 @@ public struct Configuration: Codable, Equatable {
     public var userAddress: String?
     public var userEmailAddress: String?
     public var useSendCryptoCallback: Bool?
+    public var useSendCryptoCallbackVersion: String?
     public var variant: String? = Constants.sdkVariant
     public var webhookStatusUrl: String?
     
@@ -63,10 +64,8 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "userAddress", value: userAddress)
         urlComponents.appendQueryItem(name: "userEmailAddress", value: userEmailAddress)
         
-        if useSendCryptoCallback == true {
-            urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion",
-                                          value: Constants.sendCryptoVersion)
-        }
+        urlComponents.appendQueryItem(name: "useSendCryptoCallback", value: useSendCryptoCallback);
+        urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion", value: useSendCryptoCallbackVersion);
         
         urlComponents.appendQueryItem(name: "variant", value: variant)
         urlComponents.appendQueryItem(name: "webhookStatusUrl", value: webhookStatusUrl)
