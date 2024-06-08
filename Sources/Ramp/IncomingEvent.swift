@@ -7,68 +7,62 @@ enum IncomingEvent {
     case offrampSaleCreated(OfframpSaleCreatedPayload)
 }
 
-extension IncomingEvent: DictionaryDecodable {
+extension IncomingEvent {
+    enum Error: Swift.Error {
+        case missingType
+        case missingPayload(String)
+        case missingVersion(String)
+        case unhandled(String, [String: Any]?, Int?)
+        case unhandledVersion(String, Int)
+    }
     
     init(dictionary: [String: Any]) throws {
-        let type = dictionary[CodingKeys.type] as? String
-        let payload = dictionary[CodingKeys.payload] as? [String: Any]
-        let version = dictionary[CodingKeys.version] as? Int
+        let type = dictionary["type"] as? String
+        let payload = dictionary["payload"] as? [String: Any]
+        let eventVersion = dictionary["eventVersion"] as? Int
         
-        guard let type else { throw Error.missingType }
+        guard let type else {
+            throw Error.missingType
+        }
         
         switch type {
-            
-        case EventTypes.onrampPurchaseCreated:
-            guard let payload else { throw Error.missingPayload(type) }
+        case "PURCHASE_CREATED":
+            guard let payload else {
+                throw Error.missingPayload(type)
+            }
             let decoded: OnrampPurchaseCreatedPayload = try decoder.decode(payload)
             self = .onrampPurchaseCreated(decoded)
             
-        case EventTypes.widgetClose:
-            guard let payload else { throw Error.missingPayload(type) }
+        case "WIDGET_CLOSE":
+            guard let payload else {
+                throw Error.missingPayload(type)
+            }
             let decoded: WidgetClosePayload = try decoder.decode(payload)
             self = .widgetClose(decoded)
             
-        case EventTypes.sendCrypto:
-            guard let payload else { throw Error.missingPayload(type) }
+        case "SEND_CRYPTO":
+            guard let payload else {
+                throw Error.missingPayload(type)
+            }
             /// sendCrypto is loosely versioned, which means we accept no version or version 1 only
-            if let version {
-                guard version == Constants.sendCryptoVersion else {
-                    throw Error.unhandledVersion(version, type)
+            if let eventVersion {
+                guard eventVersion == Constants.sendCryptoVersion else {
+                    throw Error.unhandledVersion(type, eventVersion)
                 }
             }
             let decoded: SendCryptoPayload = try decoder.decode(payload)
             self = .sendCrypto(decoded)
             
-        case EventTypes.offrampSaleCreated:
-            guard let payload else { throw Error.missingPayload(type) }
+        case "OFFRAMP_SALE_CREATED":
+            guard let payload else {
+                throw Error.missingPayload(type)
+            }
             let decoded: OfframpSaleCreatedPayload = try decoder.decode(payload)
             self = .offrampSaleCreated(decoded)
             
         default:
-            throw Error.unhandledType(type)
+            throw Error.unhandled(type, payload, eventVersion)
         }
-    }
-}
-
-// MARK: - Types
-
-extension IncomingEvent {
-    struct EventTypes {
-        static let onrampPurchaseCreated = "PURCHASE_CREATED"
-        static let widgetClose = "WIDGET_CLOSE"
-        static let sendCrypto = "SEND_CRYPTO"
-        static let offrampSaleCreated = "OFFRAMP_SALE_CREATED"
-    }
-    
-    struct CodingKeys {
-        static let payload = "payload"
-        static let type = "type"
-        static let version = "eventVersion"
-    }
-    
-    enum Error: Swift.Error {
-        case missingType, missingPayload(String), missingVersion(String)
-        case unhandledType(String), unhandledVersion(Int, String)
     }
 }
 

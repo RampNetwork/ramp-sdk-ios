@@ -6,7 +6,9 @@ public final class RampViewController: UIViewController {
     
     private weak var webView: WKWebView!
     private weak var stackView: UIStackView!
-    private var contentController: WKUserContentController { webView.configuration.userContentController }
+    private var contentController: WKUserContentController {
+        webView.configuration.userContentController
+    }
     
     public weak var delegate: RampDelegate?
     
@@ -18,7 +20,9 @@ public final class RampViewController: UIViewController {
     }
     
     @available(*, unavailable)
-    required init?(coder: NSCoder) { nil }
+    required init?(coder: NSCoder) {
+        nil
+    }
     
     public override func loadView() {
         let stackView = UIStackView()
@@ -59,9 +63,13 @@ public final class RampViewController: UIViewController {
     @objc private func handleSwipeBackGesture(_ sender: UIScreenEdgePanGestureRecognizer) {
         let view = sender.view!
         let deltaX = sender.translation(in: view).x
-        guard sender.state == .ended else { return }
+        guard sender.state == .ended else {
+            return
+        }
         let fraction = abs(deltaX / view.bounds.width)
-        if fraction >= 0.27 { sendOutgoingEvent(.backButtonPressed) }
+        if fraction >= 0.27 {
+            sendOutgoingEvent(.backButtonPressed)
+        }
     }
     
     private func showCloseAlert() {
@@ -69,8 +77,9 @@ public final class RampViewController: UIViewController {
                                       message: Localizable.closeAlertMessage,
                                       preferredStyle: .alert)
         alert.view.tintColor = .rampColor
-        let yesAction = UIAlertAction(title: Localizable.yes,
-                                      style: .destructive) { [unowned self] _ in self.closeRamp() }
+        let yesAction = UIAlertAction(title: Localizable.yes, style: .destructive) { [unowned self] _
+            in self.closeRamp()
+        }
         let noAction = UIAlertAction(title: Localizable.no, style: .cancel)
         alert.addAction(yesAction)
         alert.addAction(noAction)
@@ -103,7 +112,7 @@ public final class RampViewController: UIViewController {
             Logger.error(error)
             return
         }
-        let script = Constants.postMessageScript(message)
+        let script = "window.postMessage(\(message);"
         webView.evaluateJavaScript(script) { _, _ in }
     }
     
@@ -121,8 +130,11 @@ public final class RampViewController: UIViewController {
     }
     
     private func handleWidgetCloseEvent(_ payload: WidgetClosePayload) {
-        if payload.showAlert { showCloseAlert() }
-        else { closeRamp() }
+        if payload.showAlert {
+            showCloseAlert()
+        } else {
+            closeRamp()
+        }
     }
     
     private func handleSendCryptoEvent(_ payload: SendCryptoPayload) {
@@ -165,5 +177,7 @@ extension RampViewController: ScriptMessageDelegate {
 }
 
 private extension UIColor {
-    static var rampColor: UIColor { UIColor(red: 19/255.0, green: 159/255.0, blue: 106/255.0, alpha: 1) }
+    static var rampColor: UIColor {
+        UIColor(red: 19/255.0, green: 159/255.0, blue: 106/255.0, alpha: 1)
+    }
 }

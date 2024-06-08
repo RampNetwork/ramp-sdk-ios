@@ -3,108 +3,194 @@ import XCTest
 
 class IncomingEventTests: XCTestCase {
     
-    func testCorrectWidgetClose() throws {
-        let showAlert = Bool.random()
-        let payload: [String: Any] = ["type": "WIDGET_CLOSE",
-                                      "payload": ["showAlert": showAlert]]
-        let event = try IncomingEvent(dictionary: payload)
-        if case .widgetClose(let payload) = event {
-            XCTAssertEqual(payload.showAlert,
-                           showAlert,
-                           "WIDGET_CLOSE show alert flag incorrectly parsed")
-        } else { XCTFail() }
-    }
-    
-    func testCorrectSendCrypto() throws {
-        let chain = String.random()
-        let decimals = Int.random(in: 666...777)
-        let name = String.random()
-        let symbol = String.random()
-        let type = String.random()
-        let amount = String.random()
-        let address = String.random()
-        let payload: [String: Any] = ["type": "SEND_CRYPTO",
-                                      "eventVersion": 1,
-                                      "payload": [
-                                        "assetInfo": [
-                                            "chain": chain,
-                                            "decimals": decimals,
-                                            "name": name,
-                                            "symbol": symbol,
-                                            "type": type
-                                        ],
-                                        "amount": amount,
-                                        "address": address]]
-        let event = try IncomingEvent(dictionary: payload)
-        if case .sendCrypto(let payload) = event {
-            XCTAssertEqual(payload.assetInfo.chain, chain)
-            XCTAssertEqual(payload.assetInfo.decimals, decimals)
-            XCTAssertEqual(payload.assetInfo.name, name)
-            XCTAssertEqual(payload.assetInfo.symbol, symbol)
-            XCTAssertEqual(payload.assetInfo.type, type)
-            XCTAssertEqual(payload.amount, amount)
-            XCTAssertEqual(payload.address, address)
-        } else { XCTFail("Failed to decode SEND_CRYPTO event") }
-    }
-    
-    func testMissingType() throws {
-        let payload: [String: Any] = [:]
-        do {
-            let _ = try IncomingEvent(dictionary: payload)
-            XCTFail("Incorrectly decoded undefined payload")
-        } catch let error as IncomingEvent.Error {
-            guard case .missingType = error else {
-                XCTFail("Failed to throw invalid type error")
-                return
+    func testMissingType() {
+        XCTAssertThrowsError(try IncomingEvent(dictionary: [:])) { error in
+            if case IncomingEvent.Error.missingType = error {
+                // pass
+            } else {
+                XCTFail("Expected missingType, got \(String(describing: error))")
             }
         }
     }
     
-    func testInvalidType() throws {
+    func testInvalidType() {
         let invalidType = "INVALID_TYPE_NON_EXISTENT_FOR_SURE_WINNIE_THE_POOH"
-        let payload = ["type": invalidType]
-        do {
-            let _ = try IncomingEvent(dictionary: payload)
-            XCTFail("Incorrectly decoded non-existent payload type")
-        } catch let error as IncomingEvent.Error {
-            if case .unhandledType(let type) = error {
-                XCTAssertEqual(type, invalidType)
+        let eventPayload = ["type": invalidType]
+        XCTAssertThrowsError(try IncomingEvent(dictionary: eventPayload)) { error in
+            if case IncomingEvent.Error.unhandled = error {
+                // pass
             } else {
-                XCTFail("Incorrect error thrown, expected .unhandledType")
+                XCTFail("Expected missingType, got \(String(describing: error))")
             }
         }
     }
     
-    #warning("Test disabled until backend returns version")
-    //    func testMissingVersionInSendCryptoEvent() throws {
-    //        let payload: [String: Any] = ["type": "SEND_CRYPTO",
-    //                                      "payload": emptyDictionary]
-    //        do {
-    //            let _ = try IncomingEvent(dictionary: payload)
-    //            XCTFail("Incorrectly decoded SEND_CRYPTO payload with no version")
-    //        } catch let error as IncomingEvent.Error {
-    //            guard case .missingVersion = error else {
-    //                XCTFail("Incorrect error thrown, expected .missingVersion")
-    //                return
-    //            }
-    //        }
-    //    }
-    
-    func testUnknownVersionInSendCryptoEvent() throws {
-        let validType = "SEND_CRYPTO"
-        let invalidVersion = Int.random(in: 666...777)
-        let payload: [String: Any] = ["type": "SEND_CRYPTO",
-                                      "payload": emptyDictionary,
-                                      "eventVersion": invalidVersion]
-        do {
-            let _ = try IncomingEvent(dictionary: payload)
-            XCTFail("Incorrectly decoded SEND_CRYPTO payload with invalidversion")
-        } catch let error as IncomingEvent.Error {
-            if case .unhandledVersion(let version, let type) = error {
-                XCTAssertEqual(version, invalidVersion)
-                XCTAssertEqual(type, validType)
+    func testMissingPayloads() {
+        XCTAssertThrowsError(try IncomingEvent(dictionary: ["type": "PURCHASE_CREATED"])) { error in
+            if case IncomingEvent.Error.missingPayload = error {
+                // pass
             } else {
-                XCTFail("Incorrect error thrown, expected .unhandledVersion")
+                XCTFail("Expected missingPayload, got \(String(describing: error))")
+            }
+        }
+        XCTAssertThrowsError(try IncomingEvent(dictionary: ["type": "WIDGET_CLOSE"])) { error in
+            if case IncomingEvent.Error.missingPayload = error {
+                // pass
+            } else {
+                XCTFail("Expected missingPayload, got \(String(describing: error))")
+            }
+        }
+        XCTAssertThrowsError(try IncomingEvent(dictionary: ["type": "SEND_CRYPTO"])) { error in
+            if case IncomingEvent.Error.missingPayload = error {
+                // pass
+            } else {
+                XCTFail("Expected missingPayload, got \(String(describing: error))")
+            }
+        }
+        XCTAssertThrowsError(try IncomingEvent(dictionary: ["type": "OFFRAMP_SALE_CREATED"])) { error in
+            if case IncomingEvent.Error.missingPayload = error {
+                // pass
+            } else {
+                XCTFail("Expected missingPayload, got \(String(describing: error))")
+            }
+        }
+    }
+    
+    func testCorrectPurchaseCreated() {
+        let eventPayload: [String: Any] = [
+            "type": "PURCHASE_CREATED",
+            "payload": [
+                "apiUrl": "apiUrl",
+                "purchase": [
+                    "appliedFee": 1.0,
+                    "asset": [
+                        "decimals": 1,
+                        "name": "name",
+                        "symbol": "symbol",
+                        "type": "type",
+                    ],
+                    "assetExchangeRate": 1.0,
+                    "baseRampFee": 1.0,
+                    "createdAt": "createdAt",
+                    "cryptoAmount": "cryptoAmount",
+                    "fiatCurrency": "fiatCurrency",
+                    "fiatValue": 1.0,
+                    "id": "id",
+                    "networkFee": 1.0,
+                    "paymentMethodType": "paymentMethodType",
+                    "receiverAddress": "receiverAddress",
+                    "status": "status",
+                    "updatedAt": "updatedAt",
+                ],
+                "purchaseViewToken": "purchaseViewToken",
+            ]
+        ]
+        do {
+            let event = try IncomingEvent(dictionary: eventPayload)
+            if case .onrampPurchaseCreated = event {
+                // pass
+            } else {
+                XCTFail("Expected onrampPurchaseCreated, got \(String(describing: event))")
+            }
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
+    
+    func testCorrectWidgetClose() {
+        let eventPayload: [String: Any] = [
+            "type": "WIDGET_CLOSE",
+            "payload": ["showAlert": true]
+        ]
+        do {
+            let event = try IncomingEvent(dictionary: eventPayload)
+            if case .widgetClose = event {
+                // pass
+            } else {
+                XCTFail("Expected widgetClose, got \(String(describing: event))")
+            }
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
+    
+    func testCorrectSendCrypto() {
+        let eventPayload: [String: Any] = [
+            "type": "SEND_CRYPTO",
+            "eventVersion": 1,
+            "payload": [
+                "assetInfo": [
+                    "chain": "chain",
+                    "decimals": 1,
+                    "name": "name",
+                    "symbol": "symbol",
+                    "type": "type"
+                ],
+                "amount": "amount",
+                "address": "address"
+            ]
+        ]
+        do {
+            let event = try IncomingEvent(dictionary: eventPayload)
+            if case .sendCrypto = event {
+                // pass
+            } else {
+                XCTFail("Expected sendCrypto, got \(String(describing: event))")
+            }
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
+    
+    func testCorrectSaleCreated() {
+        let eventPayload: [String: Any] = [
+            "type": "OFFRAMP_SALE_CREATED",
+            "payload": [
+                "apiUrl": "apiUrl",
+                "sale": [
+                    "createdAt": "createdAt",
+                    "crypto": [
+                        "amount": "amount",
+                        "assetInfo": [
+                            "chain": "chain",
+                            "decimals": 1,
+                            "name": "name",
+                            "symbol": "symbol",
+                            "type": "type",
+                        ],
+                    ],
+                    "fiat": [
+                        "amount": 1.0,
+                        "currencySymbol": "currencySymbol",
+                    ],
+                    "id": UUID().uuidString,
+                ],
+                "saleViewToken": "purchaseViewToken",
+            ]
+        ]
+        do {
+            let event = try IncomingEvent(dictionary: eventPayload)
+            if case .offrampSaleCreated = event {
+                // pass
+            } else {
+                XCTFail("Expected offrampSaleCreated, got \(String(describing: event))")
+            }
+        } catch {
+            XCTFail(String(describing: error))
+        }
+    }
+    
+    func testUnknownVersionInSendCryptoEvent() {
+        let eventPayload: [String: Any] = [
+            "type": "SEND_CRYPTO",
+            "payload": [:],
+            "eventVersion": 666
+        ]
+        XCTAssertThrowsError(try IncomingEvent(dictionary: eventPayload)) { error in
+            if case IncomingEvent.Error.unhandledVersion = error {
+                // pass
+            } else {
+                XCTFail("Expected missingType, got \(String(describing: error))")
             }
         }
     }
