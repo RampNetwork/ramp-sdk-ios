@@ -5,7 +5,7 @@ enum OutgoingEvent {
     case sendCryptoResult(SendCryptoResultPayload)
 }
 
-extension OutgoingEvent: MessageEventEncodable {
+extension OutgoingEvent {
     
     func messagePayload() throws -> String {
         let type: String
@@ -28,7 +28,9 @@ extension OutgoingEvent: MessageEventEncodable {
         let payload: Any?
         if let payloadData {
             payload = try JSONSerialization.jsonObject(with: payloadData)
-        } else { payload = nil }
+        } else {
+            payload = nil
+        }
         
         var dictionary: [String: Any] = [CodingKeys.type: type]
         if let payload {
@@ -38,8 +40,7 @@ extension OutgoingEvent: MessageEventEncodable {
             dictionary[CodingKeys.version] = version
         }
             
-        let jsonData = try JSONSerialization
-            .data(withJSONObject: dictionary, options: .sortedKeys)
+        let jsonData = try JSONSerialization.data(withJSONObject: dictionary, options: .sortedKeys)
         
         if let jsonString = String(data: jsonData, encoding: .utf8) {
             return jsonString
@@ -63,7 +64,9 @@ extension OutgoingEvent {
         static let version = "eventVersion"
     }
     
-    enum Error: Swift.Error { case stringEncodingFailed }
+    enum Error: Swift.Error {
+        case stringEncodingFailed
+    }
 }
 
 // MARK: - Payloads

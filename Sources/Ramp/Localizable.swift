@@ -13,6 +13,10 @@ struct Localizable {
         NSLocalizedString("You will loose all progress and will have to start over",
                           comment: "Alert message for closing Ramp")
     }
-    static var yes: String { NSLocalizedString("Yes", comment: "Yes") }
-    static var no: String { NSLocalizedString("No", comment: "No") }
+    static var yes: String {
+        NSLocalizedString("Yes", comment: "Yes")
+    }
+    static var no: String {
+        NSLocalizedString("No", comment: "No")
+    }
 }

@@ -5,8 +5,8 @@ public struct Configuration: Codable, Equatable {
     public var containerNode: String?
     public var deepLinkScheme: String?
     public var defaultAsset: String?
-    public var defaultFlow: Flow?
-    public var enabledFlows: Set<Flow>?
+    public var defaultFlow: String?
+    public var enabledFlows: Set<String>?
     public var fiatCurrency: String?
     public var fiatValue: String?
     public var finalUrl: String?
@@ -32,21 +32,25 @@ public struct Configuration: Codable, Equatable {
     public init() {}
 }
 
-extension Configuration {
-    public func buildUrl() throws -> URL {
-        guard var urlComponents = URLComponents(string: url) else { throw Error.invalidUrl }
-        urlComponents.path = "/"
+public extension Configuration {
+    enum Error: Swift.Error {
+        case invalidUrl
+        case invalidParameters
+    }
+    
+    static let onramp = "ONRAMP"
+    static let offramp = "OFFRAMP"
+    
+    func buildUrl() throws -> URL {
+        guard var urlComponents = URLComponents(string: url) else {
+            throw Error.invalidUrl
+        }
         
         urlComponents.appendQueryItem(name: "containerNode", value: containerNode)
         urlComponents.appendQueryItem(name: "deepLinkScheme", value: deepLinkScheme)
         urlComponents.appendQueryItem(name: "defaultAsset", value: defaultAsset)
         urlComponents.appendQueryItem(name: "defaultFlow", value: defaultFlow)
-        
-        if let enabledFlows {
-            let value = enabledFlows.map(\.rawValue).joined(separator: ",")
-            urlComponents.appendQueryItem(name: "enabledFlows", value: value)
-        }
-        
+        urlComponents.appendQueryItem(name: "enabledFlows", value: enabledFlows?.joined(separator: ","))
         urlComponents.appendQueryItem(name: "fiatCurrency", value: fiatCurrency)
         urlComponents.appendQueryItem(name: "fiatValue", value: fiatValue)
         urlComponents.appendQueryItem(name: "finalUrl", value: finalUrl)
@@ -63,25 +67,15 @@ extension Configuration {
         urlComponents.appendQueryItem(name: "swapAsset", value: swapAsset)
         urlComponents.appendQueryItem(name: "userAddress", value: userAddress)
         urlComponents.appendQueryItem(name: "userEmailAddress", value: userEmailAddress)
-        
-        urlComponents.appendQueryItem(name: "useSendCryptoCallback", value: useSendCryptoCallback);
-        urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion", value: useSendCryptoCallbackVersion);
-        
+        urlComponents.appendQueryItem(name: "useSendCryptoCallback", value: useSendCryptoCallback)
+        urlComponents.appendQueryItem(name: "useSendCryptoCallbackVersion", value: useSendCryptoCallbackVersion)
         urlComponents.appendQueryItem(name: "variant", value: variant)
         urlComponents.appendQueryItem(name: "webhookStatusUrl", value: webhookStatusUrl)
         
-        if let url = urlComponents.url { return url }
-        else { throw Error.invalidParameters }
+        if let url = urlComponents.url {
+            return url
+        } else {
+            throw Error.invalidParameters
+        }
     }
-}
-
-public extension Configuration {
-    enum Flow: String, CaseIterable, Codable, Hashable, Identifiable {
-        public var id: String { rawValue }
-        
-        case offramp = "OFFRAMP"
-        case onramp = "ONRAMP"
-    }
-    
-    enum Error: Swift.Error { case invalidUrl, invalidParameters }
 }
