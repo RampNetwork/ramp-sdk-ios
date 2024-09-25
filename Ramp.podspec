@@ -2,7 +2,7 @@ Pod::Spec.new do |spec|
     spec.name = 'Ramp'
     spec.version = '4.0.2'
     spec.license = 'MIT'
-    spec.summary = 'Ramp SDK for iOS'
+    spec.summary = 'Ramp Network SDK for iOS'
     spec.homepage = 'https://ramp.network/'
     spec.authors = { 'Ramp Network' => 'dev@ramp.network' }
     spec.source = { :git => 'https://github.com/RampNetwork/ramp-sdk-ios.git', :tag => spec.version }

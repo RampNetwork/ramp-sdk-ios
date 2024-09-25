@@ -1,6 +1,6 @@
-# Ramp iOS SDK
+# Ramp Network iOS SDK
 
-Ramp iOS SDK is a library that allows you to easily integrate the Ramp widget into your mobile app and communicate with it.
+Ramp Network iOS SDK is a library that allows you to easily integrate the Ramp Network's widget into your mobile app and communicate with it.
 
 ## Documentation
 
