@@ -4,7 +4,7 @@ import XCTest
 class ConfigurationTests: XCTestCase {
     
     struct Constants {
-        static let defaultUrl = "https://app.ramp.network/?sdkType=IOS&sdkVersion=4.0.2&variant=sdk-mobile"
+        static let defaultUrl = "https://app.rampnetwork.com/?sdkType=IOS&sdkVersion=4.0.3&variant=sdk-mobile"
     }
     
     func testEmptyConfiguration() throws {

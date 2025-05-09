@@ -1,6 +1,6 @@
 import Foundation
 
-/// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.ramp.network/configuration)
+/// Parameters description and usage can be found at [Ramp Configuratoin Documentation](https://docs.rampnetwork.com/configuration)
 public struct Configuration: Decodable {
     
     /// main URL
